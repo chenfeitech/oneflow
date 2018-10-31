@@ -1,0 +1,46 @@
+{{define "base"}}
+<div class="panel-group" id="accordion_log" role="tablist" aria-multiselectable="true">
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingCmdline">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#accordion_log" href="#collapseCmdline" aria-expanded="true" aria-controls="collapseCmdline">
+          Command Line
+        </a>
+      </h4>
+    </div>
+    <div id="collapseCmdline" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingCmdline">
+      <div class="panel-body">
+        {{.Cmdline}}
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingOutput">
+      <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion_log" href="#collapseOutput" aria-expanded="true" aria-controls="collapseOutput">
+          Standard Output
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOutput" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOutput">
+      <div class="panel-body">
+        <pre>{{.Output}}</pre>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingError">
+      <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion_log" href="#collapseError" aria-expanded="false" aria-controls="collapseError">
+          Error Output
+        </a>
+      </h4>
+    </div>
+    <div id="collapseError" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingError">
+      <div class="panel-body">
+        <pre>{{.Error}}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}
