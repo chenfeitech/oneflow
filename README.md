@@ -57,15 +57,17 @@ to the work dir, or just make a link from pkg dir to the work dir. just like thi
     /web/actionflow.sql
 
 ## init data
-    insert into tbProducts (`PId`,`State`,`Name`,`DBHost`,`DBName`, `StarLevel`) values("222", 1, "223","127.0.0.1","223db", 1);
-    insert into tbServer(`host`,`port`,`username`,`password`) values("127.0.0.1", 22, "helight", "helight");
-    insert into tbServer(`host`,`port`,`username`,`password`) values("10.0.2.15", 22, "helight", "helight");
+    insert into tbProducts (`PId`,`State`,`Name`,`DBHost`,`DBName`, `StarLevel`) 
+        values ("222", 1, "223","127.0.0.1","223db", 1);
+    insert into tbServer(`host`,`port`,`username`,`password`) values ("127.0.0.1", 22, "helight", "helight");
+    insert into tbServer(`host`,`port`,`username`,`password`) values ("10.0.2.15", 22, "helight", "helight");
 
 # lua demo
     put those lua script to the task and run it, first you should have the shell script in this lua script.
-'''
-print("123")
-puuid, output=gassert(remote_exec("127.0.0.1", "/data/actionflow/bin/script/test.sh", "222"))
-print("Process UUID:"..puuid)
-print("Remote exec output:"..output)
-'''
+    
+    '''
+    print("123")
+    puuid, output=gassert(remote_exec("127.0.0.1", "/data/actionflow/bin/script/test.sh", "222"))
+    print("Process UUID:"..puuid)
+    print("Remote exec output:"..output)
+    '''
