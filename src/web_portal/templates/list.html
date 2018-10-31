@@ -1,0 +1,77 @@
+{{define "body"}}
+<table class="table table-striped">
+  <thead>
+  	<tr>
+  	  <th>#</th>
+  	  <th>Name</th>
+  	  <th>Description</th>
+  	  <th>Creator</th>
+  	  <th>Create At</th>
+  	</tr>
+  </thead>
+  <tbody>
+  {{ range $index, $element := .ListData }}
+  	<tr data-href="{{url "show_flow" "id" $element.Id}}">
+  	  <td>{{ add $index 1 }}</td>
+  	  <td>{{ $element.Name }}</td>
+  	  <td>{{ $element.Description }}</td>
+  	  <td>{{ $element.Creator }}</td>
+  	  <td>{{ $element.CreateTime | time_format }}</td>
+  	</tr>
+  {{end}}
+  </tbody>
+</table>
+<nav style="display:none">
+  <ul class="pager">
+    <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
+    <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
+  </ul>
+</nav>
+
+<script type="text/javascript">
+$(function(){
+    $('.table tr[data-href]').each(function(){
+        $(this).css('cursor','pointer').hover(
+            function(){ 
+                $(this).addClass('active'); 
+            },  
+            function(){ 
+                $(this).removeClass('active'); 
+            }).click( function(){ 
+                document.location = $(this).attr('data-href'); 
+            }
+        );
+    });
+
+  //$(window).scroll(bindScroll);
+});
+
+function loadMore()
+{
+   console.log("More loaded");
+   $("body").append("<div>");
+   $(window).bind('scroll', bindScroll);
+ }
+
+
+function bindScroll(){
+   if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+       $(window).unbind('scroll');
+       loadMore();
+   }
+}
+
+
+</script>
+{{end}}
+
+{{define "title"}}List{{end}}
+
+{{define "extratitle"}}<div class="pull-right">
+<a class="btn btn-primary" href="{{url "add_flow"}}" role="button">Add Flow</a>
+</div>
+{{end}}
+
+{{define "extrahead"}}{{end}}
+
+{{define "extrabody"}}{{end}}

@@ -1,0 +1,308 @@
+{{define "body"}}
+<div class="bs-callout bs-callout-info">
+  <h4>流程: <a href="{{url "show_flow" "id" .Model.FlowId}}">{{.Model.Name}} ({{.Model.FlowId}})</a></h4>
+
+  <div class="row">
+    <div class="col-md-1 flow">
+      <h6>PId: </h6>
+    </div>
+    <div class="col-md-8 flow">
+      <h6>{{.Model.PId}}</h6>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-1 flow">
+      <h6>Key: </h6>
+    </div>
+    <div class="col-md-8 flow">
+      <h6>{{.Model.Key}}</h6>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-1 flow">
+      <h6>RunningDay: </h6>
+    </div>
+    <div class="col-md-8 flow">
+      <h6>{{.Model.RunningDay | time_format "2006-01-02"}}</h6>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-1 flow">
+      <h6>LastTask: </h6>
+    </div>
+    <div class="col-md-8 flow">
+      <h6>{{.Model.LastTask}}</h6>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-10 flow">
+      <p>{{.Model.Description}}</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      {{range $index, $element := .ListData }}
+          <div class="panel panel-default {{if $element.State}}{{$element.State | task_state}}{{end}}">
+            <div class="panel-heading state-heading" role="tab" id="heading{{.Id|default ""}}" >
+              <div data-toggle="collapse" data-parent="#accordion" href="#collapse{{.Id|default ""}}" aria-expanded="true" aria-controls="collapse{{$element.Id|default ""}}">
+                <span class="name">{{$element.Name|default ""}}</span>
+                <div class="pull-right">
+                  <span class="name">ID: {{$element.Id|default ""}}</span>
+                </div>
+                <div style="margin: 5px;"><span>{{$element.Description|default ""}}</span></div>
+                <div style="margin: 5px;">
+                  <span>{{if $element.State}}State: {{$element.State | task_state}}{{end}}&nbsp;</span>
+                  <div class="pull-right"><em style="color:#f0f0f0">{{$element.LastUpdateTime | time_format }}</em></div>
+                </div>
+              </div>
+            </div>
+            <div id="collapse{{$element.Id|default ""}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{$element.Id|default ""}}">
+              <div class="panel-body">
+                <div class="row" style="margin-bottom:10px">
+                  <div class="col-sm-6 col-md-3 b-r b-light">
+                    <span class="fa-stack fa-2x pull-left m-r-sm text-center"> 
+                      <i class="glyphicon glyphicon-dashboard" style="color:#5bc0de"></i>
+                    </span>
+                    <span class="h5 block m-t-xs">
+                      <strong>{{$element.ReadyTime|time_format|default ""}}</strong>
+                    </span>
+                    <small class="text-muted text-uc">Ready</small> 
+                  </div>
+                  <div class="col-sm-6 col-md-3 b-r b-light">
+                    <span class="fa-stack fa-2x pull-left m-r-sm text-center"> 
+                      <i class="glyphicon glyphicon-dashboard" style="color:#6ABE05"></i>
+                    </span>
+                    <span class="h5 block m-t-xs">
+                      <strong>{{$element.RunningTime|time_format|default ""}}</strong>
+                    </span>
+                    <small class="text-muted text-uc">Running</small> 
+                  </div>
+                  <div class="col-sm-6 col-md-3 b-r b-light">
+                    <span class="fa-stack fa-2x pull-left m-r-sm text-center"> 
+                      <i class="glyphicon glyphicon-dashboard" style="color:#337ab7"></i>
+                    </span>
+                    <span class="h5 block m-t-xs">
+                      <strong>{{$element.SucceedTime|time_format|default ""}}</strong>
+                    </span>
+                    <small class="text-muted text-uc">Succeed</small> 
+                  </div>
+                  <div class="col-sm-6 col-md-3 b-r b-light">
+                    <span class="fa-stack fa-2x pull-left m-r-sm text-center"> 
+                      <i class="glyphicon glyphicon-dashboard" style="color:#FF5050"></i>
+                    </span>
+                    <span class="h5 block m-t-xs">
+                      <strong>{{$element.FailedTime|time_format|default "-"}}</strong>
+                    </span>
+                    <small class="text-muted text-uc">Failed</small> 
+                  </div>
+                </div>
+                <div class="row">
+                  <button class="btn btn-default rerun" type="button" onclick="rerun({{$index}});">Rerun this task</button>
+                  <button class="btn btn-default rerun" type="button" onclick="rerun_seqs({{$index}});">Rerun task sequences</button>
+                  <button class="btn btn-danger force_rerun" type="button" onclick="rerun({{$index}});">Force rerun this task</button>
+                  <button class="btn btn-danger force_rerun" type="button" onclick="rerun_seqs({{$index}});">Force rerun task sequences</button>
+                </div>
+              </div>
+              <ul class="list-group">
+                <li class="list-group-item">日志</li>
+                <li class="list-group-item">
+                  <pre class="log" date="{{$element.ReadyTime | default $.Model.RunningDay | time_format "2006-01-02"}}">{{$element.ScriptOutput}}</pre>
+                </li>
+              </ul>
+            </div>
+          </div>
+      {{end}}
+  </div>
+</div>
+
+<script type="text/javascript">
+  var task_list = {{.ListData | json_encode}};
+
+  var run_finished = true;
+  for (var i=0; i<task_list.length; ++i) {
+    if (task_list[i].State < 2) {
+      run_finished = false;
+      break;
+    }
+  }
+
+  if (run_finished) {
+    $(".force_rerun").hide();
+  } else {
+    $(".rerun").hide();
+  }
+
+
+  function rerun(i) {
+    bootbox.confirm("Are you sure rerun task " + task_list[i].Name +"?", function(result) {
+      if (result) {
+        do_rerun(i, true);
+      }
+    }); 
+  }
+  function rerun_seqs(i) {
+    bootbox.confirm("Are you sure rerun task sequences from " + task_list[i].Name +"?", function(result) {
+      if (result) {
+        do_rerun(i, false);
+      }
+    }); 
+  }
+
+  function do_rerun(i, single) {
+    document.location.href="./rerun/{{.Model.Id}}/"+task_list[i].Id+"/"+ (single?"true":"false");
+  }
+
+  function show_log(date, ip, uuid) {
+    
+      bootbox.dialog({
+                title: "运行日志",
+                message: '<div class="log-modal-body">' +
+        '<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>' +
+      '</div>'})
+
+    var url="log/" + date + "/" + ip + "/" + uuid;
+    var jqxhr = $.get( url, function(body) {
+        $(".log-modal-body").html(body);
+      })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+        $(".log-modal-body").html("加载日志失败！<br/>" + jqXHR.responseText);
+        });
+  }
+
+  $(function(){
+    $("pre.log").each(function(idx, ele) {
+        that=$(ele); 
+        that.html(that.text().replace(/\[(([0-9]{1,3}\.){3}[0-9]{1,3})\] RUN:UUID\[(([0-9]|[a-f]|\-){36})\]/g, "<a class='process_log'  data-toggle='tooltip' data-placement='bottom' title='Show logs' href='javascript:show_log(\"" + that.attr("date") + "\",\"$1\",\"$3\")'>$&</a>"));
+     });
+
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>
+{{end}}
+
+
+{{define "title"}}{{.Model.Name|default ""}}{{end}}
+
+{{define "extratitle"}}
+<div class="pull-right">
+</div>
+{{end}}
+
+
+{{define "extrahead"}}
+<style type="text/css">
+pre.log{
+  display: block;
+  padding: ;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1;
+  color: #333;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: rgba(0, 0, 0, 0);
+  border: 0;
+  border-radius: 0;
+}
+
+.state_btn {
+  text-align: left;
+}
+ol.vertical {
+  margin: 0 0 9px 0;
+  min-height: 30px;
+}
+  ol.vertical button {
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #cccccc;
+    background: #eeeeee;
+    min-height: 60px;
+   width: 100%;
+  }
+
+.state-heading span
+{
+  color: #FFFFFF;
+}
+.Ready .panel-heading
+{
+  background-color:#5bc0de !important;
+  border-color: #5bc0de !important;
+}
+.Running  .panel-heading
+{
+  background-color:#6ABE05 !important;
+  border-color:#6ABE05 !important;
+}
+
+.Succeed  .panel-heading
+{
+  background-color: #337ab7 !important;
+  border-color: #337ab7 !important;
+}
+
+.Failed  .panel-heading
+{
+  background-color:#FF5050 !important;
+  border-color:#FF5050 !important;
+}
+
+.Unknown  .panel-heading
+{
+  background-color: #f0ad4e !important;
+  border-color:#f0ad4e !important;
+}
+
+.bs-callout-info {
+  border-left-color: #1b809e !important;
+}
+.bs-callout {
+  padding: 5px 20px 5px 20px;
+  margin: 20px 0;
+  border: 1px solid #eee;
+  border-left-width: 5px;
+  border-radius: 3px;
+}
+.fa-stack {
+  position: relative;
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  line-height: 2em;
+  vertical-align: middle;
+}
+.fa-2x {
+  font-size: 2em;
+}
+.pull-left {
+  float: left !important;
+}
+.clear {
+  display: block;
+  overflow: hidden;
+}
+.m-t-xs {
+  margin-top: 5px;
+  margin-bottom: 0px;
+}
+.block {
+  display: block;
+}
+.b-light {
+  border-color: #e4e4e4;
+}
+.b-r {
+  border-right: 1px solid #cfcfcf;
+}
+</style>
+
+<script src="../static/js/bootbox.min.js"></script>
+{{end}}
+
+
+{{define "extrabody"}}
+{{end}}

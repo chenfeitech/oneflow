@@ -1,0 +1,382 @@
+{{define "body"}}
+<div class="row">
+  <div class="col-md-4 flow">
+    <ol class='example vertical'>
+      {{range $index, $element := .Model.Tasks }}
+        {{template "task_item" $element}}
+      {{end}}
+    </ol>
+    <ol class='template' style="display:none">
+    {{template "task_item"}}
+    </ol>
+  </div>
+  <div class="col-md-8">
+    <div id="control_panel" class="panel panel-default">
+      <div class="panel-body">
+        <p class="title">流程属性</p>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label for="inputID" class="col-sm-2 control-label">ID</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="inputID" onkeyup="on_id_change(this, event);" onchange="on_id_change(this, event);">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputName" class="col-sm-2 control-label">名称</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="inputName" onkeyup="on_name_change(this, event);" onchange="on_name_change(this, event);">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputDescription" class="col-sm-2 control-label">描述</label>
+            <div class="col-sm-10">
+              <textarea class="form-control" id="inputDescription" rows="5" onchange="on_description_change(this, event);"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="myMsgBox" tabindex="-1" role="dialog" aria-labelledby="myMsgBoxTitle" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myMsgBoxTitle">Modal title</h4>
+      </div>
+      <div class="modal-body">
+      <div id="myMsgBoxBody"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}
+
+{{define "task_item"}}
+      <li onclick="on_task_click(event);" task_id="{{.Id|default ""}}" new_task_id="{{.Id|default ""}}" description="{{.Description|default ""}}">
+      <i class="glyphicon glyphicon-move move" aria-hidden="true"></i> <span class="name">{{.Name|default ""}}</span>
+      <div class="pull-right"><i onclick="on_task_remove(event);" class="glyphicon glyphicon glyphicon-trash remove" aria-hidden="true"></i></div></li>
+{{end}}
+
+{{define "title"}}{{.Model.Name|default "新流程"}}{{end}}
+
+{{define "extratitle"}}
+<div class="pull-right">
+<button class="btn btn-primary" role="button" onclick="add_task(event);">
+添加任务
+</button>
+
+<button id="save_btn" class="btn btn-primary" role="button" data-loading-text="Saving..." onclick="save(event);">
+保存
+</button>
+</div>
+{{end}}
+
+{{define "extrahead"}}
+<script src="http://johnny.github.io/jquery-sortable/js/jquery-sortable.js"></script>
+
+<style type="text/css">
+body.dragging, body.dragging * {
+  cursor: move !important;
+}
+
+.dragged {
+  position: absolute;
+  top: 0;
+  opacity: .5;
+  z-index: 2000;
+}
+
+ol.vertical {
+  margin: 0 0 9px 0;
+  min-height: 30px; 
+}
+  ol.vertical li {
+    display: block;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #cccccc;
+    color: #0088cc;
+    background: #eeeeee; 
+    min-height: 60px;
+  }
+  ol.vertical li.placeholder {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border: none; }
+    ol.vertical li.placeholder:before {
+      position: absolute;
+      content: "";
+      width: 0;
+      height: 0;
+      margin-top: -5px;
+      left: -5px;
+      top: -4px;
+      border: 5px solid transparent;
+      border-left-color: red;
+      border-right: none; }
+
+ol.vertical li:hover
+{
+  background-color:#cccccc;
+} 
+ol i.move {
+  cursor: pointer;
+}
+ol i.remove {
+  cursor: pointer;
+}
+
+li.selected {
+  background:#aaaaaa !important;
+}
+</style>
+
+{{end}}
+
+{{define "extrabody"}}
+<script>
+  var flow_id = "{{.Model.Id|default ""}}";
+  var new_flow_id = "{{.Model.Id|default "NEWFLOW"}}";
+  var li_template = null;
+  var selected_item = null;
+  var task_num = 1;
+  var flow_name = "{{.Model.Name|default "新流程"}}";
+  var flow_description = "{{.Model.Description|default ""}}";
+  var delete_item = [];
+
+  function change_select(sel) {
+    if (selected_item == sel) {
+      return;
+    } else if (selected_item != null && sel != null && selected_item.get(0) == sel.get(0)) {
+      return;
+    }
+    if (selected_item != null) {
+      selected_item.removeClass("selected");
+    }
+    selected_item = sel;
+    if (selected_item != null) {
+      selected_item.addClass("selected");
+    };
+
+    var control_panel = $("#control_panel");
+    tmp_control_panel = control_panel.clone(true, true).removeAttr("id");
+    tmp_control_panel.insertBefore(control_panel);
+
+    if (sel == null) {
+      control_panel.find(".title").text("流程属性");
+      control_panel.find("#inputID").val(new_flow_id).attr("readonly", flow_id=="" ? null : "");
+      control_panel.find("#inputName").val(flow_name);
+      control_panel.find("#inputDescription").val(flow_description);
+    } else {
+      control_panel.find(".title").text("任务属性");
+      control_panel.find("#inputID").val(selected_item.attr("new_task_id")).attr("readonly", null);
+      control_panel.find("#inputName").val(sel.find(".name").text());
+      control_panel.find("#inputDescription").val(selected_item.attr("description"));
+    }
+    control_panel.finish().hide().slideDown(200, function(){control_panel.show();});
+    tmp_control_panel.finish().show().slideUp(200, function(){tmp_control_panel.remove();});
+  }
+
+  function add_task(event) {
+    event.stopPropagation();
+
+    var lis = $("ol.example li");
+    var new_task_ids = {};
+    for (var i = 0; i < lis.length; i++) {
+      var ele = $(lis[i]);
+      new_task_ids[ele.attr("new_task_id")] = true;
+    }
+    
+    for (var id = lis.length+1; new_task_ids["TASK_" + id]; ++id) {
+    }
+
+    new_li = li_template.clone().appendTo($("ol.example"));
+    new_li.attr("new_task_id", "TASK_" + id);
+    new_li.find(".name").text("任务" + id);
+    new_li.click(function (e)
+      {
+        change_select($(e.target));
+      });
+    change_select(new_li);
+    ++task_num;
+  }
+
+  function on_id_change(obj, event) {
+    obj = $(obj);
+    if (selected_item == null) {
+      new_flow_id = obj.val();
+    } else {
+      selected_item.attr("new_task_id", obj.val());
+    }
+  }
+
+  function on_name_change(obj, event) {
+    obj = $(obj);
+    if (selected_item == null) {
+      flow_name = obj.val();
+      $("#page_title").text(flow_name);
+      document.title = flow_name;
+    } else {
+      selected_item.find(".name").text(obj.val());
+    }
+  }
+
+  function on_description_change(obj, event) {
+    obj = $(obj);
+    if (selected_item == null) {
+      flow_description = obj.val();
+    } else {
+      selected_item.attr("description", obj.val());
+    }
+  }
+
+
+  function on_task_click(e)
+  {
+    if (e.target.tagName == "LI")
+    {
+      change_select($(e.target));
+    }
+  }
+
+
+  function on_task_remove(e)
+  {
+    var ele = $(e.target).parents("li");
+    var task_id = ele.attr("task_id");
+    if (task_id != "") {
+      delete_item.push(task_id);
+    }
+    ele.remove();
+  }
+
+
+  function msg_box(title, message) {
+    $("#myMsgBoxTitle").text(title);
+    $("#myMsgBoxBody").html(message);
+    $('#myMsgBox').modal();
+  }
+
+  function save(event) {
+    event.stopPropagation();
+
+    if (new_flow_id.trim() == "") {
+        change_select(null);
+        msg_box("错误", "流程ID不能为空！");
+        return;
+    }
+
+    var url = "{{url "api"}}";
+
+    var lis = $("ol.example li");
+    var tasks = new Array(lis.length);
+    var new_task_ids = {};
+    for (var i = 0; i < lis.length; i++) {
+      var ele = $(lis[i]);
+      var task_id = ele.attr("task_id");
+      var new_task_id = ele.attr("new_task_id").trim();
+      if (new_task_id == "") {
+        change_select(ele);
+        msg_box("错误", "任务ID不能为空！");
+        return;
+      }
+      if (new_task_ids[new_task_id]) {
+        msg_box("错误", "任务ID重复！");
+        change_select(ele);
+        return;
+      }
+      new_task_ids[new_task_id] = true;
+
+      if (task_id != new_task_id && task_id != "") {
+        delete_item.push(task_id);
+      }
+
+      tasks[i] = {"id": new_task_id, "name": ele.find(".name").text(), "description": ele.attr("description")};
+    }
+    
+    var request_params = {
+      "id": flow_id == "" ? new_flow_id : flow_id,
+      "name": flow_name, 
+      "description": flow_description,
+      "tasks": tasks,
+      "deleteTaskIds": delete_item
+    }
+
+    var request = {};
+    request.id = 2;
+    if (flow_id != "") {
+      request.method = "FlowService.UpdateFlow";
+    } else {
+      request.method = "FlowService.AddFlow";
+    }
+    request.params = [request_params];
+
+
+    console.log(JSON.stringify(request));
+
+
+    var $btn = $("#save_btn").button('loading');
+    $.ajax({
+      url: url, 
+      data: JSON.stringify(request), 
+      type: "POST",
+      contentType: "application/json", 
+      success: function(rpcRes) {
+        $btn.button('reset');
+        if (rpcRes.error != null && rpcRes.error != "") {
+          $("#myMsgBoxTitle").text("错误");
+          $("#myMsgBoxBody").text("保存失败：" + rpcRes.error);
+          $('#myMsgBox').modal();
+        } else {
+          document.location.href = "{{url "show_flow" "id" "__id__"}}".replace("__id__", new_flow_id);
+        }
+      }, 
+      error: function(err, status, thrown) {
+        $btn.button('reset');
+        $("#myMsgBoxTitle").text("请求失败");
+        $("#myMsgBoxBody").html(err.statusText + "<br/>" + err.responseText);
+        $('#myMsgBox').modal();
+      }
+    }); 
+  }
+
+  $(function  () {
+    var control_panel = $("#control_panel");
+
+    control_panel.find(".title").text("流程属性");
+    control_panel.find("#inputID").val(new_flow_id).attr("readonly", flow_id=="" ? null : "");
+    control_panel.find("#inputName").val(flow_name);
+    control_panel.find("#inputDescription").val(flow_description);
+
+    li_template = $("ol.template li");
+
+    $("ol.example").sortable({
+      group: 'no-drop',
+      handle: 'i.glyphicon'
+    });
+
+  $(document).click(function (e)
+  {
+      var container = $("ol.example");
+      var control_panel = $("#control_panel");
+      var msgBox = $("#myMsgBox");
+      if (!container.is(e.target) // if the target of the click isn't the container...
+          && container.has(e.target).length === 0 // ... nor a descendant of the container
+          && !control_panel.is(e.target)
+          && control_panel.has(e.target).length === 0 
+          && !msgBox.is(e.target)
+          && msgBox.has(e.target).length === 0 
+          )
+      {
+          change_select(null);
+      }
+  });
+  })
+</script>
+ {{end}}

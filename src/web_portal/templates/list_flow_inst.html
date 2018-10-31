@@ -1,0 +1,206 @@
+{{define "body"}}
+<section class="panel panel-default">
+<div class="row wrapper">
+    <div class="col-sm-5 m-b-xs">
+        <input class="input-sm input-s datepicker form-control" style="width: 120px" size="16" type="text" value="{{.Date | time_format "2006-01-02" }}" data-date-format="yyyy-mm-dd">
+    </div>
+    <div class="col-sm-4 m-b-xs">
+        <div id="filter" class="btn-group" data-toggle="buttons">
+            <label class="btn btn-sm btn-default active">
+                <input type="radio" name="options" id="option1" key=""> 所有 </label>
+            <label class="btn btn-sm btn-default">
+                <input type="radio" name="options" id="option2" key="手游"> 手游 </label>
+            <label class="btn btn-sm btn-default">
+                <input type="radio" name="options" id="option2" key="端游"> 端游 </label>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="input-group">
+            <input type="text" class="form-control input-sm" placeholder="pid" id="search_tb">
+             <span class="input-group-btn"> <button class="btn btn-sm btn-default" type="button" id="search_btn">Search!</button> </span>
+        </div>
+    </div>
+</div>
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+    	<tr>
+    	  <th>#</th>
+        <th>Flow</th>
+        <th>PId</th>
+        <th>Key</th>
+        <th>Day</th>
+        <th>Create At</th>
+    	  <th>Last Task</th>
+        <th>Last Task State</th>
+        <th>Last Update Time</th>
+    	</tr>
+    </thead>
+    <tbody>
+    {{ range $index, $element := .ListData }}
+    	<tr data-href="{{url "show_flow_inst" "id" $element.Id}}" id="row_{{$element.Id}}">
+    	  <td rowspan="2">{{ add $index 1 }}</td>
+        <td><a href="{{url "show_flow" "id" $element.FlowId}}">{{ $element.Name }}</a></td>
+        <td>{{ $element.PId}}</td>
+        <td>{{ $element.Key }}</td>
+        <td>{{ $element.RunningDay | time_format "2006-01-02" }}</td>
+    	  <td>{{ $element.CreateTime | time_format }}</td>
+        <td>{{ $element.LastTask }}</td>
+        <td>{{ $element.LastTaskState | task_state }}</td>
+        <td>{{ $element.LastUpdateTime | time_format }}</td>
+    	</tr>
+      <tr data-href="{{url "show_flow_inst" "id" $element.Id}}" id="row_{{$element.Id}}_flowchart">
+        <td colspan="8">
+        {{ range $index1, $element1 := get_task_insts $element }}
+
+          {{if $index1}}
+            <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+          {{end}}
+            <span class="label label-{{$element1.State | default ""}}" data-toggle="tooltip" data-placement="bottom" title="{{$element1.State | task_state}}">{{$element1.Name}}</span>
+        {{end}}
+        </td>
+      </tr>
+    {{end}}
+    </tbody>
+  </table>
+</div>
+</section>
+<nav style="display:none">
+  <ul class="pager">
+    <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
+    <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
+  </ul>
+</nav>
+
+<script type="text/javascript">
+$(function(){
+    $('.table tr[data-href]').each(function(){
+        $(this).css('cursor','pointer').hover(
+            function(){
+                $(this).addClass('active');
+            },
+            function(){
+                $(this).removeClass('active');
+            }).click( function(){
+                document.location = $(this).attr('data-href');
+            }
+        );
+    });
+  $('[data-toggle="tooltip"]').tooltip();
+
+  $('.datepicker').datepicker({
+    todayBtn: "linked",
+    forceParse: true,
+    orientation: "bottom",
+    autoclose: true,
+    todayHighlight: true
+  }).on("hide", function(e) {
+    console.log(e.format("yyyy-mm-dd"));
+    if ("{{.Date | time_format "2006-01-02" }}" != e.format("yyyy-mm-dd")) {
+      document.location = "?date=" + e.format("yyyy-mm-dd");
+    }
+  });
+
+  $("#filter :input").change(function() {
+    key = $(this).attr("key");
+    for (var i = 0; i < list_data.length; i++) {
+      if (key=="" || list_data[i].Name.includes(key)) {
+        $("#row_" + list_data[i].Id).show();
+        $("#row_" + list_data[i].Id + "_flowchart").show();
+      } else {
+        $("#row_" + list_data[i].Id).hide();
+        $("#row_" + list_data[i].Id + "_flowchart").hide();
+      }
+    }
+  });
+
+  $("#search_btn").click(function() {
+    key = $("#search_tb").val();
+
+    for (var i = 0; i < list_data.length; i++) {
+      if (key=="" || list_data[i].PId== key) {
+        $("#row_" + list_data[i].Id).show();
+        $("#row_" + list_data[i].Id + "_flowchart").show();
+      } else {
+        $("#row_" + list_data[i].Id).hide();
+        $("#row_" + list_data[i].Id + "_flowchart").hide();
+      }
+    }
+  });
+
+});
+
+var list_data = {{.ListData | json_encode}};
+
+</script>
+
+<script src="./static/js/bootstrap-datepicker.js"></script>
+{{end}}
+
+{{define "title"}}流程实例列表{{end}}
+
+{{define "extratitle"}}<div class="pull-right"></div>{{end}}
+
+{{define "extrahead"}}
+<link rel="stylesheet" type="text/css" href="./static/css/bootstrap-datepicker.css">
+<style type="text/css">
+tr:hover, tr:hover + tr, tr:hover tr {
+    background:#f9f9f9; }
+
+.label {
+  display: inline;
+  padding: .2em .6em .3em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+  background-color: #f0ad4e;
+}
+
+.label- {
+  background-color: #aaaaaa;
+}
+.label--1 {
+  background-color: #aaaaaa;
+}
+.label-0 {
+  background-color: #5bc0de;
+}
+.label-1 {
+  background-color: #6ABE05;
+}
+.label-2 {
+  background-color: #337ab7;
+}
+.label-3 {
+  background-color: #d9534f;
+}
+
+.wrapper {
+  padding: 15px;
+}
+
+.m-b-xs {
+  margin-bottom: 5px;
+}
+select.input-sm {
+  height: 30px;
+  line-height: 30px;
+}
+.v-middle {
+  vertical-align: middle !important;
+}
+.inline {
+  display: inline-block !important;
+}
+.input-s-sm {
+  width: 120px;
+}
+</style>
+{{end}}
+
+{{define "extrabody"}}{{end}}

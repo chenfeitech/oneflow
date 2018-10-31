@@ -1,0 +1,9 @@
+{{define "left_nav"}}
+          <ul class="nav nav-sidebar">
+            <li class="{{if eq .Section "list_flow_insts"}}active{{end}}"><a href="{{url "list_flow_insts"}}">Process</a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li class="{{if eq .Section "add_flow"}}active{{end}}"><a href="{{url "add_flow"}}">Add Flow</a></li>
+            <li class="{{if eq .Section "list_flow"}}active{{end}}"><a href="{{url "list_flow"}}">Flows</a></li>
+          </ul>
+{{end}}

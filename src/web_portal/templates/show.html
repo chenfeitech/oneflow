@@ -1,0 +1,92 @@
+{{define "body"}}
+<div class="bs-callout bs-callout-info">
+    <h4>ID: {{.Model.Id}}</h4>
+    <p>{{.Model.Description}}</p>
+</div>
+
+<div class="row">
+  <div class="col-md-8 flow">
+    <ol class='example vertical'>
+      {{range $index, $element := .Model.Tasks }}
+        {{template "task_item" $element}}
+      {{end}}
+    </ol>
+  </div>
+</div>
+{{end}}
+
+{{define "task_item"}}
+      <li> 
+        <span class="name"><b>{{.Name|default ""}}</b></span>
+        <div class="pull-right">
+          <span class="name">ID: {{.Id|default ""}}</span>
+        </div>
+        <div style="margin: 5px;">{{.Description|default ""}}</div>
+      </li>
+{{end}}
+
+{{define "title"}}{{.Model.Name|default ""}}{{end}}
+
+{{define "extratitle"}}
+<div class="pull-right">
+<a class="btn btn-primary" role="button" href="{{url "edit_flow" "id" .Model.Id}}">
+编辑
+</a>
+</div>
+{{end}}
+
+
+{{define "extrahead"}}
+<style type="text/css">
+
+ol.vertical {
+  margin: 0 0 9px 0;
+  min-height: 30px; 
+}
+  ol.vertical li {
+    display: block;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #cccccc;
+    background: #eeeeee; 
+    min-height: 60px;
+  }
+  ol.vertical li.placeholder {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border: none; }
+    ol.vertical li.placeholder:before {
+      position: absolute;
+      content: "";
+      width: 0;
+      height: 0;
+      margin-top: -5px;
+      left: -5px;
+      top: -4px;
+      border: 5px solid transparent;
+      border-left-color: red;
+      border-right: none; }
+
+ol.vertical li:hover
+{
+  background-color:#cccccc;
+} 
+
+.bs-callout-info {
+  border-left-color: #1b809e !important;
+}
+.bs-callout {
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid #eee;
+  border-left-width: 5px;
+  border-radius: 3px;
+}
+</style>
+
+{{end}}
+
+
+{{define "extrabody"}}
+{{end}}
