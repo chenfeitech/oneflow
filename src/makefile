@@ -12,9 +12,9 @@ FAgent=task_agent/flow_agent
 
 all: server agent
 
-server:export GOROOT=/usr/local/go1.4/
+server:export GOROOT=/usr/local/go1.11/
 server:
-	$(go1.4) build -o $(FServer) flow_server.go
+	$(go1.11) build -o $(FServer) flow_server.go
 	cp $(FServer) ../pkg/bin/
 
 agent:export GOROOT=/usr/local/go1.11/
