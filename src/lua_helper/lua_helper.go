@@ -73,6 +73,7 @@ func GetStateByPId(pid string) *iState {
 func GetState() *iState {
 	L := &iState{}
 	// L.State = luar.Init()
+	L.LState = lua.NewState()
 	L.RemoteExecRecords = make([]*RemoteExecRec, 0)
 	L.RemoteExecUseRoot = true
 
@@ -169,9 +170,9 @@ func assert(L *lua.LState) int {
 // 	return 0
 // }
 //
-// func (s *iState) GetRemoteTaskCount() int {
-// 	return s.remote_task_count
-// }
+func (s *iState) GetRemoteTaskCount() int {
+	return s.remote_task_count
+}
 //
 // var (
 // 	tslice    = typeof((*[]interface{})(nil))
