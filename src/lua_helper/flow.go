@@ -264,8 +264,9 @@ func StartFlowTask(pid string, key string, task *model.Task, creator string, dat
 
 		var output string
 		log.Info(pid, key, task, "get pid info")
-		err = L.DoString("product=db_query_dict(\"select * from tbProducts where PId=?\", pid)[1]")
-		if err != nil {
+		// err = L.DoString("product=db_query_dict(\"select * from tbProducts where PId=?\", pid)[1]")
+		product, err := model.GetProductsByKey(pid)
+		if product == nil {
 			output = output + log.Error("Run init script error:", err).Error()
 		}
 		log.Info(pid, key, task, "SaveState")

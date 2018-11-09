@@ -6,15 +6,12 @@ import (
 	// "encoding/json"
 	"fmt"
 	"io"
-	// "math"
 	"model"
 	// "reflect"
 	// "strings"
 
 	"github.com/yuin/gopher-lua"
-	// lua "github.com/aarzilli/golua/lua"
 	log "github.com/cihub/seelog"
-	// "github.com/stevedonovan/luar"
 )
 
 // var (
