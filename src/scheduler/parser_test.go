@@ -103,8 +103,8 @@ func TestSpecSchedule(t *testing.T) {
 		expr     string
 		expected *SpecSchedule
 	}{
-		{"5 * * * *", &SpecSchedule{1 << 1, 1 << 5, all(hours), all(dom), all(months), all(dow)}},
-		{"@every 5m", &SpecSchedule{1 << 1, 1 << 5, all(hours), all(dom), all(months), all(dow)}},
+		{"5 * * * *", &SpecSchedule{1, 1 << 5, all(hours), all(dom), all(months), all(dow)}},
+		{"@every 5m", &SpecSchedule{1, 1 << 5, all(hours), all(dom), all(months), all(dow)}},
 	}
 
 	for _, c := range entries {
@@ -113,7 +113,7 @@ func TestSpecSchedule(t *testing.T) {
 			t.Error(err)
 		}
 		if !reflect.DeepEqual(actual, c.expected) {
-			t.Errorf("%s => (expected) %b != %b (actual)", c.expr, c.expected, actual)
+			t.Errorf("%s => (expected) %b != (actual) %b", c.expr, c.expected, actual)
 		}
 	}
 

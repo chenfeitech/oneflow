@@ -40,6 +40,8 @@ func Parse(spec string) (_ *SpecSchedule, err error) {
 		fields = append(fields, "*")
 	}
 
+	fmt.Println("seconds.min: ", seconds.min)
+
 	schedule := &SpecSchedule{
 		Second: getField(fields[0], seconds),
 		Minute: getField(fields[1], minutes),
@@ -225,7 +227,7 @@ func parseDescriptor(spec string) *SpecSchedule {
 			log.Panicf("Failed to parse duration %s: %s", spec, err)
 		}
 		spec := &SpecSchedule{
-			Second: 1 << 1,
+			Second: 1 << seconds.min,
 			Minute: 1 << (uint(duration.Minutes()) % 60),
 			Hour:   1 << (uint(duration.Hours()) % 24),
 			Dom:    all(dom),
