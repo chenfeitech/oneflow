@@ -1,4 +1,4 @@
-package lua_helper
+package new_lua_helper
 
 import (
 	"bytes"

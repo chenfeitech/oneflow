@@ -1,10 +1,10 @@
-package lua_helper
+package new_lua_helper
 
 import (
 	"bufio"
 	"bytes"
 	// "encoding/json"
-	"fmt"
+	// "fmt"
 	"io"
 	// "math"
 	"model"
@@ -12,15 +12,15 @@ import (
 	// "strings"
 
 	"github.com/yuin/gopher-lua"
-	// lua "github.com/aarzilli/golua/lua"
-	log "github.com/cihub/seelog"
+	// "github.com/yuin/gluamapper"
+	// log "github.com/cihub/seelog"
 	// "github.com/stevedonovan/luar"
 )
 
-// var (
-// 	LuaGlobal   = luar.Map{}
-// 	LuaPackages = make(map[string]luar.Map)
-// )
+//var (
+//	LuaGlobal   = luar.Map{}
+//	LuaPackages = make(map[string]luar.Map)
+//)
 
 type iState struct {
 	*lua.LState
@@ -37,25 +37,32 @@ type iState struct {
 }
 
 func (l *iState) iRegister() {
-	log.Info("Do Register ")
-	fmt.Println("Do Register ")
+	// funcs := luar.Map{}
+	// for name, fun := range LuaGlobal {
+	// 	funcs[name] = fun
+	// }
+
 	l.Do_init(l.LState)
-//	funcs := luar.Map{}
-//	for name, fun := range LuaGlobal {
-//		funcs[name] = fun
-//	}
-//
-//	lval := reflect.ValueOf(l)
-//	ltype := reflect.TypeOf(l)
-//	for i := 0; i < ltype.NumMethod(); i++ {
-//		method := ltype.Method(i)
-//		if strings.HasPrefix(method.Name, "Lua_") {
-//			fun_name := strings.TrimPrefix(method.Name, "Lua_")
-//			log.Info("Register ", fun_name)
-//			funcs[fun_name] = lval.MethodByName(method.Name).Interface()
-//		}
-//	}
-//	luar.Register(l.State, "", funcs)
+
+	// lval := reflect.ValueOf(l)
+	// ltype := reflect.TypeOf(l)
+	// for i := 0; i < ltype.NumMethod(); i++ {
+	// 	method := ltype.Method(i)
+	// 	if strings.HasPrefix(method.Name, "Lua_") {
+	// 		fun_name := strings.TrimPrefix(method.Name, "Lua_")
+	// 		// funcs[fun_name] = lval.MethodByName(method.Name).Interface()
+	// 		log.Info("Register ", fun_name)
+	// 		fmt.Println("name: ", fun_name)
+	// 		// l.SetGlobal(fun_name, l.NewFunction(lval.MethodByName(method.Name)))
+	// 		// if fn, ok := lval.MethodByName(method.Name).Interface().(lua.LGFunction); ok {
+	// 		// 	log.Info("Register ", fun_name)
+	// 		// 	l.Register(fun_name, fn)
+	// 		// } else {
+	// 		// 	fmt.Println("err: ", ok, " name: ", fun_name)
+	// 		// }
+	// 	}
+	// }
+	// luar.Register(l.LState, "", funcs)
 }
 
 func (l *iState) GetOutput() string {
@@ -72,7 +79,8 @@ func GetStateByPId(pid string) *iState {
 
 func GetState() *iState {
 	L := &iState{}
-	// L.State = luar.Init()
+	//L.LState = luar.Init()
+	L.LState = lua.NewState()
 	L.RemoteExecRecords = make([]*RemoteExecRec, 0)
 	L.RemoteExecUseRoot = true
 
@@ -80,15 +88,15 @@ func GetState() *iState {
 
 	L.OpenLibs()
 	L.iRegister()
+	// L.Register("print", L.print)
 	L.Register("gassert", assert)
-//	L.Register("print", L.print)
-//	luar.Register(L.State, "", luar.Map{
-//		"pprint": L.pprint,
-//	})
-//
-//	for pkgname, pkgcontent := range LuaPackages {
-//		luar.Register(L.State, pkgname, pkgcontent)
-//	}
+	// luar.Register(L.State, "", luar.Map{
+	// 	"pprint": L.pprint,
+	// })
+
+	// for pkgname, pkgcontent := range LuaPackages {
+	// 	luar.Register(L.State, pkgname, pkgcontent)
+	// }
 	return L
 }
 
@@ -107,11 +115,15 @@ func assert(L *lua.LState) int {
 	return top
 }
 
+func (s *iState) GetRemoteTaskCount() int {
+	return s.remote_task_count
+}
+
 // func (l *iState) pprint(i int) {
 // 	fmt.Fprintln(l.writer, i)
 // }
-//
-// func (l *iState) print(L *lua.State) int {
+
+// func (l *iState) print(L *lua.LState) int {
 // 	top := L.GetTop()
 // 	for i := 1; i <= top; i++ {
 // 		t := L.Type(i)
@@ -168,11 +180,7 @@ func assert(L *lua.LState) int {
 // 	l.writer.Write(([]byte)("\n"))
 // 	return 0
 // }
-//
-// func (s *iState) GetRemoteTaskCount() int {
-// 	return s.remote_task_count
-// }
-//
+
 // var (
 // 	tslice    = typeof((*[]interface{})(nil))
 // 	tmap      = typeof((*map[string]interface{})(nil))
