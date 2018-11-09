@@ -24,5 +24,11 @@ agent:
 	$(go1.11) build -o $(FAgent) task_agent/main.go
 	cp $(FAgent) ../pkg/bin/
 
+test:export GOROOT=/usr/local/go1.11/
+test:
+	$(go1.11) test -v lua_helper/lua_test.go lua_helper/lua_helper.go lua_helper/remote.go
+	$(go1.11) test -v new_lua_helper/lua_test.go new_lua_helper/lua_helper.go new_lua_helper/remote.go
+
 clean:
+	go clean
 	rm $(FServer) $(FAgent) app/client app/luar_demo -f

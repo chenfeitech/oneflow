@@ -1,23 +1,26 @@
 package lua_helper
 
 import (
-	"utils/alarm"
-	"errors"
-	// "fmt"
-	"utils/helper"
-	"model"
 	"strings"
 	"sync"
 	"time"
+	"errors"
+
+	// "fmt"
+	"utils/alarm"
+	"utils/helper"
+	"model"
 
 	log "github.com/cihub/seelog"
-	"github.com/stevedonovan/luar"
+	"github.com/yuin/gopher-lua"
+	"layeh.com/gopher-luar"
+	// "github.com/stevedonovan/luar"
 )
 
 func init() {
-	LuaGlobal["FindTaskByFlowId"] = model.FindTaskByFlowId
-	LuaGlobal["GetTaskInstById"] = model.GetTaskInstById
-	//LuaGlobal["StartFlow"] = StartFlow
+	// LuaGlobal["FindTaskByFlowId"] = model.FindTaskByFlowId
+	// LuaGlobal["GetTaskInstById"] = model.GetTaskInstById
+	// //LuaGlobal["StartFlow"] = StartFlow
 }
 
 var (
@@ -236,15 +239,24 @@ func StartFlowTask(pid string, key string, task *model.Task, creator string, dat
 		L := GetState()
 		defer RevokeState(L)
 		log.Info(pid, key, task, "Register")
-		luar.Register(L.State, "", luar.Map{
-			"pid":      pid,
-			"date":      date,
-			"key":       key,
-			"creator":   creator,
-			"task":      task,
-			"state_log": state_log,
-			"task_inst": task_inst,
-		})
+
+		L.SetGlobal("pid", lua.LString(pid))
+		L.SetGlobal("date", luar.New(L.LState, date))
+		L.SetGlobal("key", lua.LString(key))
+		L.SetGlobal("creator", lua.LString(creator))
+		L.SetGlobal("task", luar.New(L.LState, task))
+		L.SetGlobal("state_log", luar.New(L.LState, state_log))
+		L.SetGlobal("task_inst", luar.New(L.LState, task_inst))
+
+		//luar.Register(L.LState, "", luar.Map{
+		//	"pid":      pid,
+		//	"date":      date,
+		//	"key":       key,
+		//	"creator":   creator,
+		//	"task":      task,
+		//	"state_log": state_log,
+		//	"task_inst": task_inst,
+		//})
 
 		L.Task = task
 		L.FlowInstance = flow_inst
@@ -252,8 +264,9 @@ func StartFlowTask(pid string, key string, task *model.Task, creator string, dat
 
 		var output string
 		log.Info(pid, key, task, "get pid info")
-		err = L.DoString("product=db_query_dict(\"select * from tbProducts where PId=?\", pid)[1]")
-		if err != nil {
+		// err = L.DoString("product=db_query_dict(\"select * from tbProducts where PId=?\", pid)[1]")
+		product, err := model.GetProductsByKey(pid)
+		if product == nil {
 			output = output + log.Error("Run init script error:", err).Error()
 		}
 		log.Info(pid, key, task, "SaveState")

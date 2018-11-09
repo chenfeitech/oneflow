@@ -22,6 +22,7 @@ import (
 	"middleware/remote_utils"
 
 	"code.google.com/p/uuid"
+	"github.com/yuin/gopher-lua"
 	log "github.com/cihub/seelog"
 	"golang.org/x/crypto/ssh"
 )
@@ -76,14 +77,64 @@ var (
 	}
 )
 
-func (l *iState) Lua_remote_exec_set_env(name string, value interface{}) {
+func (l *iState) Do_init(L *lua.LState) {
+	// L.Register("hello_world", L.NewFunction(Lua_hello_world))
+	// L.Register("hello_world", Lua_hello_world)
+	L.SetGlobal("hello_world", L.NewFunction(l.Lua_hello_world))
+	L.SetGlobal("remote_exec_set_env", L.NewFunction(l.Lua_remote_exec_set_env))
+	L.SetGlobal("remote_exec", L.NewFunction(l.Lua_remote_exec))
+}
+
+func (l *iState) Lua_hello_world(L *lua.LState) int {
+	num := L.GetTop()
+	name := L.ToString(1)
+	fmt.Println("num: ", num, " hello world: ", name)
+	L.Pop(num)
+	return 0
+}
+
+func (l *iState) Lua_remote_exec_set_env(L *lua.LState) int {
+	num := L.GetTop()
+	if num != 2 {
+		fmt.Println("request args num should be 2, but ", num)
+		return 1
+	}
+	name := L.CheckString(1)
+	value := L.CheckString(1)
+	l.remote_exec_set_env(name, value)
+
+	return 0;
+}
+
+func (l *iState) remote_exec_set_env(name string, value string) {
 	if l.RemoteExecEnv == nil {
 		l.RemoteExecEnv = make(map[string]string)
 	}
 	l.RemoteExecEnv[name] = fmt.Sprint(value)
 }
 
-func (l *iState) Lua_remote_exec(host string, program string, args ...interface{}) (guid string, output string, err error) {
+func (l *iState) Lua_remote_exec(L *lua.LState) int {
+	num := L.GetTop()
+	if num < 2 {
+		fmt.Println("request args num should be more then2, but ", num)
+		return 1
+	}
+	host := L.CheckString(1)
+	program := L.CheckString(2)
+	args := ""
+	if num > 2 {
+		args = L.CheckString(3)
+		for i:=4; i <= num; i++ {
+			args = args + ", " + L.CheckString(i)
+		}
+	}
+	guid, output, err := l.remote_exec(host, program, args)
+	fmt.Println("xxx guid: ", guid, " output: ", output, " err: ", err)
+
+	return 0;
+}
+
+func (l *iState) remote_exec(host string, program string, args ...interface{}) (guid string, output string, err error) {
 	if len(host) == 0 {
 		panic(errors.New("Must give remote host to exec program!"))
 	}
