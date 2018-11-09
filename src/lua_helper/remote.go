@@ -33,8 +33,6 @@ type RemoteExecRec struct {
 }
 
 func init() {
-	//LuaGlobal["remote_exec"] = remote_exec
-
 	md5_sum := md5.New()
 	bin, err := os.Open(local_task_agent_path)
 	if err != nil {
@@ -55,7 +53,6 @@ var (
 var (
 	task_agent_filename = "flow_agent"
 
-	// remote_task_agent_dir  = *config.ServerRoot + "/bin/"
 	remote_task_agent_dir  = *config.ServerRoot + "/agent/"
 	remote_task_agent_path = remote_task_agent_dir + task_agent_filename
 )
@@ -77,9 +74,7 @@ var (
 	}
 )
 
-func (l *iState) Do_init(L *lua.LState) {
-	// L.Register("hello_world", L.NewFunction(Lua_hello_world))
-	// L.Register("hello_world", Lua_hello_world)
+func (l *iState) Remote_init(L *lua.LState) {
 	L.SetGlobal("hello_world", L.NewFunction(l.Lua_hello_world))
 	L.SetGlobal("remote_exec_set_env", L.NewFunction(l.Lua_remote_exec_set_env))
 	L.SetGlobal("remote_exec", L.NewFunction(l.Lua_remote_exec))

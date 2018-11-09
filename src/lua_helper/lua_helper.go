@@ -3,12 +3,9 @@ package lua_helper
 import (
 	"bufio"
 	"bytes"
-	// "encoding/json"
 	"fmt"
 	"io"
 	"model"
-	// "reflect"
-	// "strings"
 
 	"github.com/yuin/gopher-lua"
 	log "github.com/cihub/seelog"
@@ -36,7 +33,7 @@ type iState struct {
 func (l *iState) iRegister() {
 	log.Info("Do Register ")
 	fmt.Println("Do Register ")
-	l.Do_init(l.LState)
+	l.Remote_init(l.LState)
 //	funcs := luar.Map{}
 //	for name, fun := range LuaGlobal {
 //		funcs[name] = fun
@@ -105,120 +102,7 @@ func assert(L *lua.LState) int {
 	return top
 }
 
-// func (l *iState) pprint(i int) {
-// 	fmt.Fprintln(l.writer, i)
-// }
-//
-// func (l *iState) print(L *lua.State) int {
-// 	top := L.GetTop()
-// 	for i := 1; i <= top; i++ {
-// 		t := L.Type(i)
-// 		if L.IsGoStruct(i) {
-// 			//fmt.Println("IsGoStruct")
-// 			l.writer.Write(([]byte)(fmt.Sprintf("%+v", L.ToGoStruct(i))))
-// 			continue
-// 		}
-// 		if IsValueProxy(L, i) {
-// 			//fmt.Println("IsValueProxy")
-// 			value, _ := ValueOfProxy(L, i)
-// 			kind := value.Kind()
-// 			if kind == reflect.Ptr {
-// 				kind = value.Elem().Kind()
-// 			}
-// 			if value.CanInterface() {
-// 				json_bytes, _ := json.MarshalIndent(value.Interface(), "", "  ")
-// 				fmt.Fprintln(l.writer, string(json_bytes))
-// 			} else {
-// 				log.Warn("Lua vm print value proxy failed, type:", kind)
-// 			}
-// 			continue
-// 		}
-// 		switch t {
-// 		case lua.LUA_TSTRING:
-// 			l.writer.Write(([]byte)(L.ToString(i)))
-// 		case lua.LUA_TNUMBER:
-// 			val := L.ToNumber(i)
-// 			if val == math.Floor(val) {
-// 				l.writer.Write(([]byte)(fmt.Sprint(int(val))))
-// 			} else {
-// 				l.writer.Write(([]byte)(fmt.Sprint(val)))
-// 			}
-// 		case lua.LUA_TBOOLEAN:
-// 			if L.ToBoolean(i) {
-// 				l.writer.Write(([]byte)("true"))
-// 			} else {
-// 				l.writer.Write(([]byte)("false"))
-// 			}
-// 		case lua.LUA_TNIL:
-// 			l.writer.Write(([]byte)("nil"))
-//
-// 		case lua.LUA_TTABLE:
-// 			L.GetField(lua.LUA_GLOBALSINDEX, "table_print")
-// 			L.PushValue(i)
-// 			L.Call(1, 0)
-//
-// 		default:
-// 			log.Error("Print not support type:", L.Typename(i))
-// 			l.writer.Write(([]byte)(L.ToString(i)))
-// 		}
-// 		l.writer.Write(([]byte)(" "))
-// 	}
-// 	l.writer.Write(([]byte)("\n"))
-// 	return 0
-// }
-//
 func (s *iState) GetRemoteTaskCount() int {
 	return s.remote_task_count
 }
-//
-// var (
-// 	tslice    = typeof((*[]interface{})(nil))
-// 	tmap      = typeof((*map[string]interface{})(nil))
-// 	null      = Null(0)
-// 	nullv     = valueOf(null)
-// 	nullables = map[reflect.Kind]bool{
-// 		reflect.Chan:      true,
-// 		reflect.Func:      true,
-// 		reflect.Interface: true,
-// 		reflect.Map:       true,
-// 		reflect.Ptr:       true,
-// 		reflect.Slice:     true,
-// 	}
-// )
-//
-// func isNil(val reflect.Value) bool {
-// 	kind := val.Type().Kind()
-// 	return nullables[kind] && val.IsNil()
-// }
-//
-// func typeof(v interface{}) reflect.Type {
-// 	return reflect.TypeOf(v).Elem()
-// }
-//
-// var valueOf = reflect.ValueOf
-//
-// type Null int
-//
-// func IsValueProxy(L *lua.State, idx int) bool {
-// 	res := false
-// 	if L.IsUserdata(idx) {
-// 		L.GetMetaTable(idx)
-// 		if !L.IsNil(-1) {
-// 			L.GetField(-1, "luago.value")
-// 			res = !L.IsNil(-1)
-// 			L.Pop(1)
-// 		}
-// 		L.Pop(1)
-// 	}
-// 	return res
-// }
-//
-// type valueProxy struct {
-// 	value reflect.Value
-// 	t     reflect.Type
-// }
-//
-// func ValueOfProxy(L *lua.State, idx int) (reflect.Value, reflect.Type) {
-// 	vp := (*valueProxy)(L.ToUserdata(idx))
-// 	return vp.value, vp.t
-// }
+

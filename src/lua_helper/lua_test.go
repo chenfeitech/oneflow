@@ -40,6 +40,22 @@ func Test_Remote_Assert(t *testing.T) {
 	}
 }
 
+
+func Test_Hello_World(t *testing.T) {
+	L := GetState()
+	defer RevokeState(L)
+
+	err := L.DoString("print(hello_world('127.0.0.1', '/bin/ls'))")
+
+	if err != nil { //try a unit test on function
+		t.Log(err)
+		t.Error("err hello world") // 如果不是如预期的那么就报错
+	} else {
+		t.Log("hello world") //记录一些你期望记录的信息
+	}
+}
+
+
 // func Test_Remote_With_Error(t *testing.T) {
 // 	L := GetState()
 // 	defer RevokeState(L)
