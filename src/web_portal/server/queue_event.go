@@ -25,15 +25,20 @@ func startEventLoop(concurrent int, service *FlowService) error {
 	nsqConfig.MaxInFlight = 10
 	q, err := nsq.NewConsumer(config.NSQFlowTaskStatusTopic, "executor", nsqConfig)
 	if err != nil {
+		seelog.Error("Could not connect to nsq to consumer: ", err, " topic: ", config.NSQFlowTaskStatusTopic)
+		panic("Could not connect to nsq")
 		return err
 	}
 	q.AddConcurrentHandlers(&eventExecutor{jsonRPCService}, concurrent)
+	seelog.Error("try to connect to nsq for consumer: ")
 	if len(config.NSQLookupdAddress) != 0 {
 		err = q.ConnectToNSQLookupds(strings.Split(config.NSQLookupdAddress, ";"))
 	} else {
 		err = q.ConnectToNSQD(config.NSQDAddress)
 	}
 	if err != nil {
+		seelog.Error("Could not connect to nsq for consumer: ", err)
+		panic("Could not connect to nsq")
 		return err
 	}
 	return nil

@@ -96,7 +96,9 @@ func GetNSQProducer() *nsq.Producer {
 	nsqProducer, err := nsq.NewProducer(addr, nsqConfig)
 
 	if err != nil {
-		panic("Could not connect")
+		seelog.Error("get new produce failed:", err)
+		panic("Could not connect to nsq")
 	}
+	seelog.Info("get new produce ok:", addr)
 	return nsqProducer
 }
