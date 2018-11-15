@@ -1,6 +1,13 @@
 # Intor Oneaction
 oneaction
 
+#install lua
+apt-get install libncurses5-dev
+
+https://www.lua.org/ftp/ lua-5.1.5.tar.gz
+
+make linux && make install 
+
 # Install dir & work dir:
 
     you can configure the work dir for oneaction in config/config.go like this:
@@ -9,6 +16,7 @@ oneaction
     for example the work dir is /data/oneflow/, so you should copy pkg dir which is in this project
 to the work dir, or just make a link from pkg dir to the work dir. just like this:
     ln -s /home/helight/oneaction/pkg /data/oneflow
+    ln -s /home/helight/oneaction/web /home/helight/www/
 
 # Config
 ## workdir
@@ -29,6 +37,10 @@ to the work dir, or just make a link from pkg dir to the work dir. just like thi
         db_password = flag.String("db_password", "mysql", "mysql server password")
         db_name     = flag.String("db_name", "aflow", "mysql server name")
     )
+
+create database aflow;
+create user 'admin'@'localhost' IDENTIFIED BY 'mysql';
+grant all privileges on aflow.* to admin@localhost identified by 'mysql';
 
 ## server work port
     config/server.go
@@ -61,11 +73,14 @@ to the work dir, or just make a link from pkg dir to the work dir. just like thi
         values ("222", 1, "223","127.0.0.1","223db", 1);
     insert into tbServer(`host`,`port`,`username`,`password`) values ("127.0.0.1", 22, "helight", "helight");
     insert into tbServer(`host`,`port`,`username`,`password`) values ("10.0.2.15", 22, "helight", "helight");
+    insert into tbServer(`host`,`port`,`username`,`password`) values ("172.22.112.56", 22, "helight", "helight");
+
+    ERROR:ssh: handshake failed: ssh: unable to authenticate, attempted methods [none password], no supported methods remain
 
 # lua demo
     put those lua script to the task and run it, first you should have the shell script in this lua script.    
    
     print("123")
-    puuid, output=gassert(remote_exec("127.0.0.1", "/data/actionflow/bin/script/test.sh", "222"))
+    puuid, output=gassert(remote_exec("127.0.0.1", "/data/oneflow/bin/script/test.sh", "222"))
     print("Process UUID:"..puuid)
     print("Remote exec output:"..output)

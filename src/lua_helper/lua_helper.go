@@ -11,11 +11,6 @@ import (
 	log "github.com/cihub/seelog"
 )
 
-// var (
-// 	LuaGlobal   = luar.Map{}
-// 	LuaPackages = make(map[string]luar.Map)
-// )
-
 type iState struct {
 	*lua.LState
 	writer            io.Writer
@@ -34,22 +29,7 @@ func (l *iState) iRegister() {
 	log.Info("Do Register ")
 	fmt.Println("Do Register ")
 	l.Remote_init(l.LState)
-//	funcs := luar.Map{}
-//	for name, fun := range LuaGlobal {
-//		funcs[name] = fun
-//	}
-//
-//	lval := reflect.ValueOf(l)
-//	ltype := reflect.TypeOf(l)
-//	for i := 0; i < ltype.NumMethod(); i++ {
-//		method := ltype.Method(i)
-//		if strings.HasPrefix(method.Name, "Lua_") {
-//			fun_name := strings.TrimPrefix(method.Name, "Lua_")
-//			log.Info("Register ", fun_name)
-//			funcs[fun_name] = lval.MethodByName(method.Name).Interface()
-//		}
-//	}
-//	luar.Register(l.State, "", funcs)
+	
 }
 
 func (l *iState) GetOutput() string {
@@ -66,7 +46,6 @@ func GetStateByPId(pid string) *iState {
 
 func GetState() *iState {
 	L := &iState{}
-	// L.State = luar.Init()
 	L.LState = lua.NewState()
 	L.RemoteExecRecords = make([]*RemoteExecRec, 0)
 	L.RemoteExecUseRoot = true
@@ -76,14 +55,9 @@ func GetState() *iState {
 	L.OpenLibs()
 	L.iRegister()
 	L.Register("gassert", assert)
-//	L.Register("print", L.print)
-//	luar.Register(L.State, "", luar.Map{
-//		"pprint": L.pprint,
-//	})
-//
-//	for pkgname, pkgcontent := range LuaPackages {
-//		luar.Register(L.State, pkgname, pkgcontent)
-//	}
+	L.Register("print", L.print)
+	// L.SetGlobal("print", L.NewFunction(l.print))
+
 	return L
 }
 
@@ -106,3 +80,13 @@ func (s *iState) GetRemoteTaskCount() int {
 	return s.remote_task_count
 }
 
+func (l *iState) print(L *lua.LState) int {
+	top := L.GetTop()
+	for i := 1; i <= top; i++ {
+		lv := L.Get(i)
+		l.writer.Write(([]byte)(lv.String()))
+		l.writer.Write(([]byte)(" "))
+	}
+	l.writer.Write(([]byte)("\n"))
+	return 0
+}

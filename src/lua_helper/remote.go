@@ -23,6 +23,7 @@ import (
 
 	"code.google.com/p/uuid"
 	"github.com/yuin/gopher-lua"
+	// "layeh.com/gopher-luar"
 	log "github.com/cihub/seelog"
 	"golang.org/x/crypto/ssh"
 )
@@ -124,9 +125,14 @@ func (l *iState) Lua_remote_exec(L *lua.LState) int {
 		}
 	}
 	guid, output, err := l.remote_exec(host, program, args)
+	L.Push(lua.LString(guid))
+	L.Push(lua.LString(output))
+	// L.SetGlobal("guid", lua.LString(guid))
+	// L.SetGlobal("output", lua.LString(output))
+	// L.SetGlobal("err", lua.LString(err))
 	fmt.Println("xxx guid: ", guid, " output: ", output, " err: ", err)
 
-	return 0;
+	return 2;
 }
 
 func (l *iState) remote_exec(host string, program string, args ...interface{}) (guid string, output string, err error) {

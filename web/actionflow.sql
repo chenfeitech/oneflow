@@ -21,7 +21,7 @@ CREATE TABLE `tbProducts` (
   `DBName` varchar(50) DEFAULT '0',
   `StarLevel` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`PId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Create syntax for TABLE 'tbAccessFlowLog'
 CREATE TABLE `tbAccessFlowLog` (
@@ -36,7 +36,7 @@ CREATE TABLE `tbAccessFlowLog` (
   `log_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `flow_name` (`pid`,`flow_id`,`log_date`)
-) ENGINE=InnoDB AUTO_INCREMENT=11295 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Create syntax for TABLE 'tbFlow'
 CREATE TABLE `tbFlow` (
@@ -85,7 +85,7 @@ CREATE TABLE `tbFlowSchdRunLog` (
   `end_time` datetime NOT NULL,
   `result` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=222353 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Create syntax for TABLE 'tbFlowInst'
 CREATE TABLE `tbFlowInst` (
@@ -105,7 +105,7 @@ CREATE TABLE `tbFlowInst` (
   `end_task` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `flow_id` (`flow_id`,`pid`,`key`,`running_day`)
-) ENGINE=InnoDB AUTO_INCREMENT=7726990 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Create syntax for TABLE 'tbJobRunLog'
 CREATE TABLE `tbJobRunLog` (
@@ -118,7 +118,7 @@ CREATE TABLE `tbJobRunLog` (
   `end_time` datetime NOT NULL,
   `result` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Create syntax for TABLE 'tbJobSchedule'
 CREATE TABLE `tbJobSchedule` (
@@ -135,7 +135,7 @@ CREATE TABLE `tbJobSchedule` (
   `last_result` int(11) NOT NULL DEFAULT '0',
   `last_error` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Create syntax for TABLE 'tbStateReportLog'
 CREATE TABLE `tbStateReportLog` (
@@ -150,7 +150,7 @@ CREATE TABLE `tbStateReportLog` (
   `report_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `extra_data` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4122793 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Create syntax for TABLE 'tbTask'
 CREATE TABLE `tbTask` (

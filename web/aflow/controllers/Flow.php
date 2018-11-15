@@ -302,13 +302,13 @@ class Flow extends BaseController
         }
         $this->data["menu"] = 1;
         $query_result = $this->flow_manager->find_flow_by_id($id);
-        $products = $this->flow_manager->get_products();
-        $flow = $query_result[0];
+        $products = $this->flow_manager->get_products();       
 
         if (count($query_result) == 0) {
             show_404();
             return;
         }
+        $flow = $query_result[0];
         $type = 0;
 
         $flow->tasks = $this->flow_manager->find_tasks_by_flow($id);
@@ -319,6 +319,7 @@ class Flow extends BaseController
 
     public function api() {
         if ($this->input->server('REQUEST_METHOD')!="POST") {
+	        var_dump($this->input->server('REQUEST_METHOD'));
             return;
         }
         if (!$this->check_auth('group_user')) {
@@ -346,6 +347,7 @@ class Flow extends BaseController
         $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $headers = substr($response, 0, $header_size);
         $body = substr($response, $header_size);
+
         if(curl_errno($ch)) {
             show_error(curl_error($ch));
         } else {
@@ -393,12 +395,14 @@ if (!function_exists('getallheaders'))
 {
     function getallheaders()
     {
-           $headers = '';
+        $headers = array();
        foreach ($_SERVER as $name => $value)
        {
+       $iname = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
+	   // var_dump($iname);
            if (substr($name, 0, 5) == 'HTTP_')
            {
-               $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+               $headers[$iname] = $value;
            }
        }
        return $headers;
