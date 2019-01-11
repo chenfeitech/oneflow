@@ -1,13 +1,11 @@
 export GOPATH=$(shell pwd)/../:$(shell pwd)/../go-package/
 export CC=gcc -no-pie
 
-go1.4=/usr/local/go1.4/bin/go
 #go1.11=/usr/local/go1.11/bin/go
 go1.11=go
 
 FServer=flow_server
 FAgent=task_agent/flow_agent
-
 
 # find . -type d -exec golint {} \;
 

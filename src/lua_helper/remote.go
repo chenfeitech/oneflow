@@ -144,6 +144,7 @@ func (l *iState) remote_exec(host string, program string, args ...interface{}) (
 	log.Info(append([]interface{}{"remote_exec " + guid + " " + host + " " + program}, args...)...)
 
 	cmd := remote_task_agent_path + " run " + "-uuid " + guid + " -p \"" + program + "\" "
+	// cmd := []string{remote_task_agent_path, "run", "-uuid", guid, "-p", program}
 	fargs := make([]string, len(args), len(args))
 	for i := 0; i < len(args); i++ {
 		switch val := args[i].(type) {
@@ -154,6 +155,7 @@ func (l *iState) remote_exec(host string, program string, args ...interface{}) (
 			arg := strings.Replace(fmt.Sprint(args[i]), "\"", "\\\"", -1)
 			fargs[i] = fmt.Sprintf("-a \"%v\"", arg)
 		}
+		// cmd = append(cmd, "-a", conv.String(arg))
 	}
 	cmd = cmd + strings.Join(fargs, " ")
 
@@ -191,6 +193,7 @@ func (l *iState) remote_exec(host string, program string, args ...interface{}) (
 	cmdline := env.Encode() + " " + cmd
 
 	output, err = RemoteExec(host, cmdline)
+	// output, err = RemoteExec(l.RemoteExecUseRoot, host, env, cmd...)
 	if err != nil {
 		log.Error(err)
 		panic(err)
@@ -221,8 +224,52 @@ func RemoteKill(host string, day time.Time, uuid string) (err error) {
 
 	cmd := remote_task_agent_path + " kill " + "-uuid " + uuid + " -date " + day.Format("20060102")
 	output, err := RemoteExec(host, cmd)
+	// cmd := []string{remote_task_agent_path, "kill", "-uuid", uuid, "-date", day.Format("20060102")}
+	// output, err := RemoteExec(useRoot, host, nil, cmd...)
 	log.Info("Remote kill output:", output)
 	return err
+}
+
+func RemoteExec1(useRoot bool, host string, env map[string]interface{}, cmdArgs ...string) (output string, err error) {
+	g_mutex.Lock()
+	host_mutex := host_mutexs[host]
+	if host_mutex == nil {
+		host_mutex = &sync.Mutex{}
+		host_mutexs[host] = host_mutex
+	}
+	g_mutex.Unlock()
+
+	host_mutex.Lock()
+	defer host_mutex.Unlock()
+
+	if len(host) == 0 {
+		panic(errors.New("Must give remote host to exec program!"))
+	}
+
+	if env == nil {
+		env = map[string]interface{}{}
+	}
+
+	envBytes, err := json.Marshal(env)
+	if err != nil {
+		return "", err
+	}
+	cmdArgsBytes, err := json.Marshal(cmdArgs)
+	if err != nil {
+		return "", err
+	}
+
+	scriptEnv := "var Env=" + string(envBytes) + ";\n"
+	scriptCmdArgs := "var CmdArgs=" + string(cmdArgsBytes) + ";\n"
+	script := scriptEnv + scriptCmdArgs + remoteExecScript
+	log.Info("script:", script)
+	var reply interface{}
+	if useRoot {
+		err = microservice.Request(host, "Script.Exec", script, &reply)
+	} else {
+		err = microservice.SafeRequest(host, "Script.Exec", script, &reply)
+	}
+	return conv.String(reply), err
 }
 
 func RemoteExec(host string, cmdline string) (output string, err error) {
