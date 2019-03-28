@@ -1,5 +1,5 @@
-# Intor Oneaction
-oneaction
+# Intor Oneflow
+oneflow
 
 #install lua
 apt-get install libncurses5-dev
@@ -10,13 +10,13 @@ make linux && make install
 
 # Install dir & work dir:
 
-    you can configure the work dir for oneaction in config/config.go like this:
+    you can configure the work dir for oneflow in config/config.go like this:
     ServerRoot = flag.String("server_root`", "/data/oneflow/", "Root of flow server.")
 
     for example the work dir is /data/oneflow/, so you should copy pkg dir which is in this project
 to the work dir, or just make a link from pkg dir to the work dir. just like this:
-    ln -s /home/helight/oneaction/pkg /data/oneflow
-    ln -s /home/helight/oneaction/web /home/helight/www/
+    ln -s /home/helight/oneflow/pkg /data/oneflow
+    ln -s /home/helight/oneflow/web /home/helight/www/
 
 # Config
 ## workdir
@@ -66,7 +66,7 @@ grant all privileges on aflow.* to admin@localhost identified by 'mysql';
 
 # db init
 ## database create script
-    /web/actionflow.sql
+    /web/oneflow.sql
 
 ## init data
     insert into tbProducts (`PId`,`State`,`Name`,`DBHost`,`DBName`, `StarLevel`) 
