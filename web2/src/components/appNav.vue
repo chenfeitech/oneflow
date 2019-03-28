@@ -20,13 +20,10 @@ export default {
         return {
             menus: [
                 { route: '/', name: '首页' , children:false},
-                { route: '/user', name: '用户管理' , children:false},
-                // { route: '/psd', name: '密码管理' , children:false},
-                // { route: '/salary', name: '工资管理' , children:false},
-                // { route: '/attendence', name: '考勤管理' , children:false},
-                // { route: '/admin', name: '系统管理' , children:false},
-                { route: '/perform', name: '绩效考核', children: [{ route: '/month', name: '月度绩效' }, { route: '/year', name: '年度绩效' }] },
-                { route: '/feedback', name: '意见反馈' , children:false}
+                { route: '/user', name: '运行管理' , children:false},
+                { route: '/feedback', name: '流程配置' , children:false},
+                { route: '/feedback', name: 'Time配置' , children:false},
+                { route: '/perform', name: '其它管理', children: [{ route: '/month', name: '月度任务' }, { route: '/year', name: '年度任务' }] }
             ]
         }
     },

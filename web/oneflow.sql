@@ -174,7 +174,7 @@ CREATE TABLE `tbTaskInst` (
   `running_time` datetime DEFAULT NULL,
   `succeed_time` datetime DEFAULT NULL,
   `failed_time` datetime DEFAULT NULL,
-  `last_update_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `last_update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `script_output` mediumtext,
   `retries` int(10) unsigned NOT NULL DEFAULT '0',
   `remote_exec_host` varchar(30) NOT NULL DEFAULT '',

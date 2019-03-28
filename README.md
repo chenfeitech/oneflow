@@ -65,8 +65,9 @@ grant all privileges on aflow.* to admin@localhost identified by 'mysql';
     curl -d "hello 1" "http://127.0.0.1:4151/pub?topic=status.task.flow.data"
 
 # db init
+grant all privileges on aflow.* to 'admin'@'localhost' identified by 'mysql';
 ## database create script
-    /web/oneflow.sql
+mysql -uroot -Daflow < /web/oneflow.sql
 
 ## init data
     insert into tbProducts (`PId`,`State`,`Name`,`DBHost`,`DBName`, `StarLevel`) 

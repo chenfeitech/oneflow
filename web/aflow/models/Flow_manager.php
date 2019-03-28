@@ -3,7 +3,7 @@ class Flow_manager extends CI_Model {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->db = $this->load->database('flow2', TRUE);
+		$this->db = $this->load->database('flow', TRUE);
 	}
 
 	function getField($tableName, $column, $bykey, $order)

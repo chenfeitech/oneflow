@@ -384,11 +384,6 @@ class Flow extends BaseController
         }
         return $text;
     }
-
-    public function terminal()
-    {
-        $this->load->view('flow/terminal', $this->data);
-    }
 }
 
 if (!function_exists('getallheaders'))

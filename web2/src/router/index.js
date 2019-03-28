@@ -19,7 +19,7 @@ export default new Router({
       children: [
         {
           path: '/user',
-          name: '用户管理',
+          name: '运行管理',
           component: ElementTable,
         },
         {
@@ -29,22 +29,22 @@ export default new Router({
         },
         {
           path: '/feedback',
-          name: '意见反馈',
+          name: '流程配置',
           component: AgreeInfo
         },
         {
           path: '/perform',
-          name: '绩效考核',
+          name: '其它管理',
           component: Template,
           children: [
             {
               path: '/month',
-              name: '月度绩效',
+              name: '月度任务',
               component: Monthform
             },
             {
               path: '/year',
-              name: '年度绩效',
+              name: '年度任务',
               component: Theform
             }
           ]

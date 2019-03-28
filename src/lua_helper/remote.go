@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
+    // "encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -229,7 +230,7 @@ func RemoteKill(host string, day time.Time, uuid string) (err error) {
 	log.Info("Remote kill output:", output)
 	return err
 }
-
+/*
 func RemoteExec1(useRoot bool, host string, env map[string]interface{}, cmdArgs ...string) (output string, err error) {
 	g_mutex.Lock()
 	host_mutex := host_mutexs[host]
@@ -271,7 +272,7 @@ func RemoteExec1(useRoot bool, host string, env map[string]interface{}, cmdArgs 
 	}
 	return conv.String(reply), err
 }
-
+*/
 func RemoteExec(host string, cmdline string) (output string, err error) {
 	g_mutex.Lock()
 	host_mutex := host_mutexs[host]

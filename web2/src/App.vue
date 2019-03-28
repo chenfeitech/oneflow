@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="app-header">
-        <div class="title">后台管理系统</div>
+        <div class="title">OneFlow流程管理系统</div>
     </div>
     <router-view/>
   </div>
