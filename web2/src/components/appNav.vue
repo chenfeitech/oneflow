@@ -22,7 +22,7 @@ export default {
                 { route: '/', name: '首页' , children:false},
                 { route: '/user', name: '运行管理' , children:false},
                 { route: '/feedback', name: '流程配置' , children:false},
-                { route: '/feedback', name: 'Time配置' , children:false},
+                { route: '/feedback2', name: 'Time配置' , children:false},
                 { route: '/perform', name: '其它管理', children: [{ route: '/month', name: '月度任务' }, { route: '/year', name: '年度任务' }] }
             ]
         }

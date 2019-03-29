@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"config"
-	"model"
 	"lua_helper"
-	"utils/helper"
 	"middleware/remote_utils"
+	"model"
+	"utils/helper"
 	"web_portal/form"
 
 	log "github.com/cihub/seelog"
@@ -283,7 +283,7 @@ func logHandler(w http.ResponseWriter, r *http.Request) error {
 }
 
 var (
-	fileserver_path = flag.String("fileserver_path", *config.ServerRoot + "/fileserver", "Flow central file server.")
+	fileserver_path = flag.String("fileserver_path", *config.ServerRoot+"/fileserver", "Flow central file server.")
 )
 
 func fileInfoHandler(w http.ResponseWriter, r *http.Request) error {
@@ -370,7 +370,6 @@ func init() {
 	jsonRPC.RegisterCodec(jsonCodec, "application/json; charset=UTF-8") // For firefox 11 and other browsers which append the charset=UTF-8
 	service := new(FlowService)
 	jsonRPC.RegisterService(service, "")
-	// jsonRPC.RegisterService(new(FlowService), "")
 
 	r.Handle("/data_flow/api", jsonRPC).Name("api")
 	r.HandleFunc("/data_flow/ws", serveWs)

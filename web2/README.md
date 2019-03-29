@@ -1,2 +1,7 @@
-# OA_Vue_demo
-this is a OA demo  by vue
+# oneflow webadmin by vue2
+this is a oneflow webadmin  by vue
+
+# install
+npm install
+npm run dev
+npm run build
