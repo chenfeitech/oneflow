@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"errors"
 	"encoding/json"
 	"strings"
@@ -34,9 +33,7 @@ func init() {
 		flowRouteGroup.StdPOST("SetTaskInstanceSuccess", SetTaskInstanceSuccess)
 		flowRouteGroup.StdPOST("SetFlowInstanceSuccess", SetFlowInstanceSuccess)
 		flowRouteGroup.StdPOST("GetRemoteLog", GetRemoteLog)
-		
-		flowRouteGroup.StdPOST("API", RpcAPI)
-		flowRouteGroup.StdGET("GetFlows", GetFlows)
+
 	})
 }
 
@@ -184,29 +181,6 @@ func RerunTask(c *Context) (code int, message string, data interface{}) {
 	lua_helper.RerunTask(args.FlowInstId, args.TaskId, args.SingleTask, args.Creator)
 	return 0, "ok", ""
 }
-
-// begin_date=2019-03-29&end_date=2019-03-31&set_nu=all&process_type=all&process_state_type=-1&pid=all
-func GetFlows(c *Context) (code int, message string, data interface{}) {
-	begin_date := c.Query("begin_date")
-	end_date := c.Query("end_date")
-	set_nu := c.Query("set_nu")
-	flow_id := c.Query("process_type")
-	process_state_type := c.Query("process_state_type")
-	pid := c.Query("pid")
-
-	cond1 := " (fi.running_day between '"+begin_date+" 00:00:00' and '"+end_date+" 23:59:59')"
-	cond2 := " and ('"+set_nu+"' = 'all') and ('"+flow_id+"' = 'all' or f.id = '"+flow_id+"')"
-	cond3 := " and ('"+process_state_type+"' = 'all' or fi.state = "+process_state_type+" or ("+process_state_type+" = -1 and fi.`state` in (0,1,3)))"
-	cond4 := " and ('"+pid+"' = 'all' or fi.pid = '"+pid+"') ORDER BY fi.running_day desc, fi.flow_id, last_update_time DESC "
-
-	cond := cond1 + cond2 + cond3 +cond4
-	flows, err := model.GetFlowInstAll(cond)
-	if err != nil {
-		return -1, "get db error", ""
-	}
-	return -1, "ok", flows
-}
-
 
 // for ssh
 // func (h *FlowService) GetRemoteLog(r *http.Request, args *rpc_data.GetRemoteLogArgs, reply *rpc_data.GetRemoteLogReply) error {
@@ -423,22 +397,4 @@ func KillTaskInstance(c *Context) (code int, message string, data interface{}) {
 	err = model.UpdateFlowInstStateById(args.FlowInstId, model.StateFailed)
 	model.UpdateTaskInstState(args.FlowInstId, args.TaskId, model.StateFailed)
 	return 0, "ok", ""
-}
-
-func RpcAPI(c *Context) (code int, message string, data interface{}) {
-	reqbody, err := ioutil.ReadAll(c.Request.Body)	
-	if err != nil {
-		return 50001, err.Error(), nil
-	}
-	resp, err := http.Post("http://localhost/data_flow/api", "application/json; charset=utf-8", strings.NewReader(string(reqbody)))
-	if err != nil {
-		return -1, "post err", ""
-	}
-
-	defer resp.Body.Close()
-	repbody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return -1, "read post err", ""
-	}	
-	return 0, "ok", repbody
 }

@@ -13,6 +13,24 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var db2 map[string]*sql.DB = make(map[string]*sql.DB)
+var dbMutex sync.RWMutex
+
+var (
+	dbUsername = map[string]string{}
+	dbPassword = map[string]string{}
+	dbAddress  = map[string]string{}
+	dbName     = map[string]string{}
+)
+const FlowDBName string = "aflow"
+
+func init() {
+	dbAddress["aflow"] = "127.0.0.1:3306"
+	dbUsername["aflow"] = "admin"
+	dbPassword["aflow"] = "mysql"
+	dbName["aflow"] = "aflow"
+}
+
 var (
 	db_host = flag.String("db_host", func() string {
 		if runtime.GOOS == "darwin" {
@@ -47,6 +65,35 @@ func GetDBConnect() *sql.DB {
 	}
 	db.SetMaxIdleConns(10)
 	return db
+}
+func GetDBConnect2(dbname string) func() *sql.DB {
+	return func() *sql.DB {
+		dbMutex.RLock()
+		conn := db2[dbname]
+		if conn != nil {
+			dbMutex.RUnlock()
+			return conn
+		}
+		dbMutex.RUnlock()
+
+		dbMutex.Lock()
+		defer dbMutex.Unlock()
+		conn = db2[dbname]
+		if conn != nil {
+			return conn
+		}
+
+		connStr := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true&loc=Local&charset=utf8&timeout=5s", dbUsername[dbname], dbPassword[dbname], dbAddress[dbname], dbName[dbname])
+		var err error
+		conn, err = sql.Open("mysql", connStr)
+		if err != nil {
+			log.Critical("Connect to database failed: ", connStr)
+			panic(err)
+		}
+		conn.SetMaxIdleConns(10)
+		db2[dbname] = conn
+		return conn
+	}
 }
 
 func GetFlowDBConnect(host string, dbname string) (*sql.DB, error) {

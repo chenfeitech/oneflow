@@ -10,7 +10,18 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/oneflow': {
+        target: 'http://localhost',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        changeOrigin: true,//是否允许跨越
+        pathRewrite: {
+            '^/oneflow': '/oneflow',//重写,
+        }
+      }
+    },
 
     // Various Dev Server settings
     host: '0.0.0.0', // can be overwritten by process.env.HOST

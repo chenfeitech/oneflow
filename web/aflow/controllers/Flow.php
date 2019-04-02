@@ -316,7 +316,7 @@ class Flow extends BaseController
         $this->data['products'] = $products;
         $this->load->view('flow/show_flow', $this->data);
     }
-
+/*
     public function api() {
         if ($this->input->server('REQUEST_METHOD')!="POST") {
 	        var_dump($this->input->server('REQUEST_METHOD'));
@@ -360,7 +360,7 @@ class Flow extends BaseController
         curl_close($ch);
         return;
     }
-
+*/
     public function get_task_state_text($id)
     {
         $text = "";
