@@ -327,7 +327,7 @@ li.selected {
     }
     save_values();
 
-    var url = "/flow/api";
+    var url = "/oneflow/API";
 
     var lis = $("ol.example li");
     var tasks = new Array(lis.length);
@@ -374,8 +374,10 @@ li.selected {
     var request = {};
     request.id = 2;
     if (flow_id != "") {
+      // url += "UpdateFlow"
       request.method = "FlowService.UpdateFlow";
     } else {
+      // url += "AddFlow"
       request.method = "FlowService.AddFlow";
     }
     request.params = [request_params];

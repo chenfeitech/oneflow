@@ -1,19 +1,19 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
 	"net/http"
 	"os"
 	"runtime"
-	"flag"
 	"time"
 
+	"api"
 	"config"
 	"scheduler"
 	"web_portal/server"
 
-	//"github.com/gorilla/mux"
 	log "github.com/cihub/seelog"
 )
 
@@ -42,23 +42,37 @@ func main() {
 	log.Info("Envs:", os.Environ())
 
 	flow_job_scheduler := scheduler.New(
-		"FlowJobScheduler", // name,
-		"tbFlowConf",       // tableScheduler,
-		"`id`",             // columnId,
+		"FlowJobScheduler",             // name,
+		"tbFlowConf",                   // tableScheduler,
+		"`id`",                         // columnId,
 		"concat(pid, '_', process_id)", // columnJobName,
-		"`start_time`",                     // columnPattern,
+		"`start_time`",                 // columnPattern,
 		`concat('StartFlow("', process_id,'", "', pid,'", "", time.Now().Add(' ,data_delay, '*-24*time.Hour), "idata", nil)')`, // columnScript,
 		`last_run_time`,                      // columnLastRunTime,
 		`next_run_time`,                      // columnNextRunTime,
 		"last_result",                        // columnLastRunResult,
 		"last_error",                         // columnLastRunError,
 		"isactive=1 AND now() > active_date", // conditionEnabled,
-		"tbFlowSchdRunLog",               // tableLog
+		"tbFlowSchdRunLog",                   // tableLog
 	)
 	go flow_job_scheduler.RunLoop()
 	go scheduler.ScheduleLoop()
 
+	router := api.NewServer()
+
+	listenAddress := ":3002"
+	log.Info("Serve on ", listenAddress)
+
+	srv := http.Server{
+		Addr:         listenAddress,
+		Handler:      router,
+		ReadTimeout:  100 * time.Second,
+		WriteTimeout: 100 * time.Second,
+	}
+	go srv.ListenAndServe()
+
 	http.Handle("/", server.Router)
+	log.Info("Serve on ", *config.ServerPort)
 	err := http.ListenAndServe(fmt.Sprintf(":%v", *config.ServerPort), nil)
 	if err != nil {
 		fmt.Printf("ERROR:%v\n", err)

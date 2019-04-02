@@ -139,7 +139,8 @@ ol.vertical li:hover
         theme: "mdn-like"
       });
 
-  var url = "/flow/api";
+  // var url = "/flow/api";
+  var url = "/oneflow/StartFlow";
   function start_flow() {
     var request_params = {
       "id": "<?php echo ($flow->id)?>",
@@ -159,17 +160,17 @@ ol.vertical li:hover
     var $btn = $("#start_flow_btn").button('loading');
     $.ajax({
       url: url,
-      data: JSON.stringify(request),
+      data: JSON.stringify(request_params),
       type: "POST",
       contentType: "application/json",
       success: function(rpcRes) {
         $btn.button('reset');
-        if (rpcRes.error != null && rpcRes.error != "") {
+        if (rpcRes.code != 0) {
           $("#myMsgBoxTitle").text("错误");
-          $("#myMsgBoxBody").text("启动失败：" + rpcRes.error);
+          $("#myMsgBoxBody").text("启动失败：" + rpcRes.message);
           $('#myMsgBox').modal();
         } else {
-          document.location.href = "/flow/flow_inst/" + rpcRes.result.flow_inst_id;
+          document.location.href = "/flow/flow_inst/" + rpcRes.flow_inst_id;
 
           // $btn.button('reset');
           // $("#myMsgBoxTitle").text("成功");

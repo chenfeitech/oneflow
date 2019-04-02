@@ -309,7 +309,8 @@
           }); 
         }
 
-        var url = "/flow/api";
+        // var url = "/flow/api";
+        var url = "/oneflow/API";
         function do_rerun(i, single) {
           bootbox.dialog({
             title: "Rerun",
@@ -334,7 +335,8 @@
             data: JSON.stringify(request), 
             type: "POST",
             contentType: "application/json", 
-            success: function(rpcRes) {
+            success: function(rpcResData) {
+              rpcRes = rpcResData.data;
               if (rpcRes.error != null && rpcRes.error != "") {
                 $(".rerun-modal-body").html("请求失败！<br/>" + rpcRes.error);
               } else {
@@ -369,7 +371,8 @@
             data: JSON.stringify(request), 
             type: "POST",
             contentType: "application/json", 
-            success: function(rpcRes) {
+            success: function(rpcResData) {
+              rpcRes = rpcResData.data;
               if (rpcRes.error != null && rpcRes.error != "") {
                 $(".rerun-modal-body").html("请求失败！<br/>" + rpcRes.error);
               } else {
@@ -404,7 +407,8 @@
             data: JSON.stringify(request), 
             type: "POST",
             contentType: "application/json", 
-            success: function(rpcRes) {
+            success: function(rpcResData) {
+              rpcRes = rpcResData.data;
               if (rpcRes.error != null && rpcRes.error != "") {
                 $(".rerun-modal-body").html("请求失败！<br/>" + rpcRes.error);
               } else {
@@ -438,7 +442,8 @@
             data: JSON.stringify(request), 
             type: "POST",
             contentType: "application/json", 
-            success: function(rpcRes) {
+            success: function(rpcResData) {
+              rpcRes = rpcResData.data;
               if (rpcRes.error != null && rpcRes.error != "") {
                 $(".rerun-modal-body").html("请求失败！<br/>" + rpcRes.error);
               } else {
@@ -477,7 +482,8 @@
             data: JSON.stringify(request), 
             type: "POST",
             contentType: "application/json", 
-            success: function(rpcRes) {
+            success: function(rpcResData) {
+              rpcRes = rpcResData.data;
               if (rpcRes.error != null && rpcRes.error != "") {
                 $(".log-modal-body").html("加载日志失败！<br/>" + rpcRes.error);
               } else {

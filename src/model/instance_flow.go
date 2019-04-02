@@ -98,12 +98,80 @@ type FlowInst struct {
 	BeginTask      string    `sql:"begin_task"`
 	EndTask        string    `sql:"end_task"`
 }
-
+/*
+| id | flow_id  | name      | description | pid | key | running_day | create_time         | 
+ifnull(t.name, fi.`last_task_id`) | 
+last_task_state | last_update_time    | state | startup_script | begin_task | end_task |
+*/
 func FindFlowInst(condition string, args ...interface{}) ([]*FlowInst, error) {
 	sqlStr := "SELECT fi.`id`, fi.`flow_id`, f.`name`, f.`description`, fi.`pid`,  fi.`key`, fi.`running_day`, fi.`create_time`, ifnull(t.name, fi.`last_task_id`), fi.`last_task_state`, fi.last_update_time, fi.`state`, fi.`startup_script`, fi.`begin_task`, fi.`end_task` from `tbFlowInst` fi inner join `tbFlow` f on fi.flow_id = f.id left join `tbTask` t on fi.last_task_id=t.id  and t.`flow_id` = fi.`flow_id`"
 	if len(condition) > 0 {
 		sqlStr = sqlStr + " WHERE " + condition
 	}
+	results := make([]*FlowInst, 0)
+
+	stmt, err := config.GetDBConnect().Prepare(sqlStr)
+	if err != nil {
+		log.Error("sql: ", sqlStr, " err: ", err)
+		return results, err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(args...)
+	if err != nil {
+		log.Error("sql: ", sqlStr, " err: ", err)
+		return results, err
+	} else {
+		defer rows.Close()
+		for rows.Next() {
+			model := FlowInst{}
+			values := []interface{}{
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+				new(interface{}),
+			}
+			rows.Scan(values...)
+			model.Id = (int)((*(values[0].(*interface{}))).(int64))
+			model.FlowId = (string)((*(values[1].(*interface{}))).([]uint8))
+			model.Name = (string)((*(values[2].(*interface{}))).([]uint8))
+			model.Description = (string)((*(values[3].(*interface{}))).([]uint8))
+			model.PId = (string)((*(values[4].(*interface{}))).([]uint8))
+			model.Key = (string)((*(values[5].(*interface{}))).([]uint8))
+			model.RunningDay = (*(values[6].(*interface{}))).(time.Time)
+			model.CreateTime = (*(values[7].(*interface{}))).(time.Time)
+			model.LastTask = (string)((*(values[8].(*interface{}))).([]uint8))
+			model.LastTaskState = (int)((*(values[9].(*interface{}))).(int64))
+			model.LastUpdateTime = (*(values[10].(*interface{}))).(time.Time)
+			model.State = (int)((*(values[11].(*interface{}))).(int64))
+			model.StartupScript = (string)((*(values[12].(*interface{}))).([]uint8))
+			model.BeginTask = (string)((*(values[13].(*interface{}))).([]uint8))
+			model.EndTask = (string)((*(values[14].(*interface{}))).([]uint8))
+
+			results = append(results, &model)
+		}
+	}
+	return results, nil
+}
+
+// func GetFlowInstAll(begin_date string, end_date string, set_nu int, flow_id int, process_state_type int, pid int) ([]*FlowInst, error) {
+func GetFlowInstAll(condition string, args ...interface{}) ([]*FlowInst, error) {
+	sqlStr := "SELECT fi.`id`, fi.`flow_id`, f.`name`, f.`description`, fi.`pid`,  fi.`key`, fi.`running_day`, fi.`create_time`, ifnull(t.name, fi.`last_task_id`) last_task_id, fi.`last_task_state`, fi.last_update_time, fi.`state`, fi.`startup_script`, fi.`begin_task`, fi.`end_task` from `tbFlowInst` fi inner join `tbFlow` f on fi.flow_id = f.id left join `tbTask` t on fi.last_task_id=t.id  and t.`flow_id` = fi.`flow_id` left join tbProducts tbg on tbg.PId = fi.pid "
+
+	if len(condition) > 0 {
+		sqlStr = sqlStr + " WHERE " + condition
+	}
+
 	results := make([]*FlowInst, 0)
 
 	stmt, err := config.GetDBConnect().Prepare(sqlStr)

@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
-    // "encoding/json"
+
+	// "encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -18,13 +19,12 @@ import (
 	"time"
 
 	"config"
-	"utils/helper"
-	"model"
 	"middleware/remote_utils"
+	"model"
+	"utils/helper"
 
 	"code.google.com/p/uuid"
 	"github.com/yuin/gopher-lua"
-	// "layeh.com/gopher-luar"
 	log "github.com/cihub/seelog"
 	"golang.org/x/crypto/ssh"
 )
@@ -100,7 +100,7 @@ func (l *iState) Lua_remote_exec_set_env(L *lua.LState) int {
 	value := L.CheckString(1)
 	l.remote_exec_set_env(name, value)
 
-	return 0;
+	return 0
 }
 
 func (l *iState) remote_exec_set_env(name string, value string) {
@@ -121,7 +121,7 @@ func (l *iState) Lua_remote_exec(L *lua.LState) int {
 	args := ""
 	if num > 2 {
 		args = L.CheckString(3)
-		for i:=4; i <= num; i++ {
+		for i := 4; i <= num; i++ {
 			args = args + ", " + L.CheckString(i)
 		}
 	}
@@ -133,7 +133,7 @@ func (l *iState) Lua_remote_exec(L *lua.LState) int {
 	// L.SetGlobal("err", lua.LString(err))
 	fmt.Println("xxx guid: ", guid, " output: ", output, " err: ", err)
 
-	return 2;
+	return 2
 }
 
 func (l *iState) remote_exec(host string, program string, args ...interface{}) (guid string, output string, err error) {
@@ -230,6 +230,7 @@ func RemoteKill(host string, day time.Time, uuid string) (err error) {
 	log.Info("Remote kill output:", output)
 	return err
 }
+
 /*
 func RemoteExec1(useRoot bool, host string, env map[string]interface{}, cmdArgs ...string) (output string, err error) {
 	g_mutex.Lock()

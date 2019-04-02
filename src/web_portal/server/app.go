@@ -372,7 +372,6 @@ func init() {
 	jsonRPC.RegisterService(service, "")
 
 	r.Handle("/data_flow/api", jsonRPC).Name("api")
-	r.HandleFunc("/data_flow/ws", serveWs)
 
 	r.Methods("HEAD").Handler(http.StripPrefix("/data_flow/file/", handlerFunc(fileInfoHandler)))
 	r.Methods("GET").Handler(http.StripPrefix("/data_flow/file/", handlerFunc(fileGetHandler)))

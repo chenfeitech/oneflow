@@ -9,7 +9,7 @@ var (
 	NSQDAddress            string
 	NSQDServiceName        string
 	NSQLookupdAddress      string
-	NSQFlowTaskStatusTopic = "status.task.flow.idata"
+	NSQFlowTaskStatusTopic = "status.task.flow.data"
 )
 
 func init() {

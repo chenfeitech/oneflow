@@ -3,12 +3,15 @@ package api
 import (
 	// "fmt"
 	"io/ioutil"
+	"net/http"
 	"errors"
 	"encoding/json"
+	"strings"
 
+	"lua_helper"
 	"model"
+	"model/rpc_data"
 	"utils/conv"
-	// "model/jobmanager"
 
 	log "github.com/cihub/seelog"
 	"github.com/go-sql-driver/mysql"
@@ -19,6 +22,9 @@ func init() {
 		flowRouteGroup := router.Group("/oneflow/")
 		flowRouteGroup.StdPOST("AddFlow", AddFlow)
 		flowRouteGroup.StdPOST("UpdateFlow", UpdateFlow)
+		flowRouteGroup.StdPOST("StartFlow", StartFlow)
+		
+		flowRouteGroup.StdPOST("API", RpcAPI)
 		flowRouteGroup.StdGET("GetFlows", GetFlows)
 	})
 }
@@ -103,14 +109,14 @@ func UpdateFlow(c *Context) (code int, message string, data interface{}) {
 // func (h *FlowService) AddFlow(r *http.Request, args *FlowDataArgs, reply *AddFlowReply) error {
 func AddFlow(c *Context) (code int, message string, data interface{}) {
 	//1.解析参数
-	newFlow, err := ioutil.ReadAll(c.Request.Body)
+	reqbody, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
 		return 50001, err.Error(), nil
 	}
 	
-	c.Info("post: --> ", string(newFlow), " <--data")
+	c.Info("post: --> ", string(reqbody), " <--data")
 	var paramQuest RpcQuestArgs
-	err = json.Unmarshal([]byte(newFlow), &paramQuest)
+	err = json.Unmarshal([]byte(reqbody), &paramQuest)
 	if err != nil { 
         return -1, err.Error(), "Do Unmarshal err"
 	} 
@@ -145,9 +151,40 @@ func AddFlow(c *Context) (code int, message string, data interface{}) {
 	return 0, "ok", nil
 }
 
+
+// func (h *FlowService) StartFlow(r *http.Request, args *rpc_data.StartFlowArgs, reply *rpc_data.StartFlowReply) error {
+func StartFlow(c *Context) (code int, message string, data interface{}) {
+	//1.解析参数
+	reqbody, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		return 50001, err.Error(), nil
+	}
+	
+	c.Info("post: --> ", string(reqbody), " <--data")
+	var args rpc_data.StartFlowArgs
+	err = json.Unmarshal([]byte(reqbody), &args)
+	if err != nil { 
+		return -1, err.Error(), "Do Unmarshal err"
+	} 
+	date, ok := conv.Time(args.Date)
+	if !ok {
+		return  -1, "conv.Time(args.Date) err", log.Error("Parse date(yyyy-MM-dd) failed")
+	}
+	// var err error
+	var reply rpc_data.StartFlowReply
+	if len(args.TaskId) == 0 {
+		reply.FlowInstId, err = lua_helper.StartFlow(args.Id, args.PId, args.Key, date, args.Creator, &args.StartupScript)
+	} else {
+		reply.FlowInstId, err = lua_helper.StartFlowFromTask(args.Id, args.TaskId, args.PId, args.Key, date, args.Creator, &args.StartupScript)
+	}
+	if err != nil {
+		return -1, err.Error(), ""
+	}
+	return 0, "ok", reply
+}
+
 // begin_date=2019-03-29&end_date=2019-03-31&set_nu=all&process_type=all&process_state_type=-1&pid=all
 func GetFlows(c *Context) (code int, message string, data interface{}) {
-
 	begin_date := c.Query("begin_date")
 	end_date := c.Query("end_date")
 	set_nu := c.Query("set_nu")
@@ -166,4 +203,23 @@ func GetFlows(c *Context) (code int, message string, data interface{}) {
 		return -1, "get db error", ""
 	}
 	return -1, "ok", flows
+}
+
+func RpcAPI(c *Context) (code int, message string, data interface{}) {
+	reqbody, err := ioutil.ReadAll(c.Request.Body)
+	
+	if err != nil {
+		return 50001, err.Error(), nil
+	}
+	resp, err := http.Post("http://localhost/data_flow/api", "application/json; charset=utf-8", strings.NewReader(string(reqbody)))
+	if err != nil {
+		return -1, "post err", ""
+	}
+
+	defer resp.Body.Close()
+	repbody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return -1, "read post err", ""
+	}	
+	return 0, "ok", repbody
 }
