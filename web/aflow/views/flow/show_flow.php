@@ -150,13 +150,6 @@ ol.vertical li:hover
       "startup_script": editor.getValue()
     }
 
-    var request = {};
-    request.id = <?php echo rand()?>;
-    request.method = "FlowService.StartFlow";
-    request.params = [request_params];
-
-    console.log(JSON.stringify(request));
-
     var $btn = $("#start_flow_btn").button('loading');
     $.ajax({
       url: url,

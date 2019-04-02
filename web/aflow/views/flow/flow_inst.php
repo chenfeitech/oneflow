@@ -265,8 +265,6 @@
           $(".rerun").hide();
         }
 
-
-
         function kill(i) {
           bootbox.confirm("Are you sure kill task " + task_list[i].name +"?", function(result) {
             if (result) {
@@ -283,7 +281,6 @@
           }); 
         }
 
-
         function set_success(i) {
           bootbox.confirm("Are you sure set task " + task_list[i].name +" success?", function(result) {
             if (result) {
@@ -291,8 +288,6 @@
             }
           }); 
         }
-
-
 
         function rerun(i) {
           bootbox.confirm("Are you sure rerun task " + task_list[i].name +"?", function(result) {
@@ -310,7 +305,7 @@
         }
 
         // var url = "/flow/api";
-        var url = "/oneflow/API";
+        // var url = "/oneflow/API";
         function do_rerun(i, single) {
           bootbox.dialog({
             title: "Rerun",
@@ -325,20 +320,16 @@
             "Creator": "<?php echo $userEnName?>"
           }
 
-          var request = {};
-          request.id = 3;
-          request.method = "FlowService.RerunTask";
-          request.params = [request_params];
-
+          var url = "/oneflow/RerunTask";
           $.ajax({
             url: url, 
-            data: JSON.stringify(request), 
+            data: JSON.stringify(request_params), 
             type: "POST",
             contentType: "application/json", 
-            success: function(rpcResData) {
-              rpcRes = rpcResData.data;
-              if (rpcRes.error != null && rpcRes.error != "") {
-                $(".rerun-modal-body").html("请求失败！<br/>" + rpcRes.error);
+            success: function(rpcRes) {
+              // rpcRes = rpcResData.data;
+              if (rpcRes.code != 0) {
+                $(".rerun-modal-body").html("请求失败！<br/>" + rpcRes.message);
               } else {
                 document.location.reload();
               }
@@ -361,20 +352,16 @@
             "taskId": task_list[i].id,
           }
 
-          var request = {};
-          request.id = 3;
-          request.method = "FlowService.KillTaskInstance";
-          request.params = [request_params];
-
+          var url = "/oneflow/KillTaskInstance";
           $.ajax({
             url: url, 
-            data: JSON.stringify(request), 
+            data: JSON.stringify(request_params), 
             type: "POST",
             contentType: "application/json", 
-            success: function(rpcResData) {
-              rpcRes = rpcResData.data;
-              if (rpcRes.error != null && rpcRes.error != "") {
-                $(".rerun-modal-body").html("请求失败！<br/>" + rpcRes.error);
+            success: function(rpcRes) {
+              // rpcRes = rpcResData.data;
+              if (rpcRes.code != 0) {
+                $(".rerun-modal-body").html("请求失败！<br/>" + rpcRes.message);
               } else {
                 document.location.reload();
               }
@@ -397,20 +384,16 @@
             "taskId": task_list[i].id,
           }
 
-          var request = {};
-          request.id = 3;
-          request.method = "FlowService.SetTaskInstanceSuccess";
-          request.params = [request_params];
-
+          var url = "/oneflow/SetTaskInstanceSuccess";
           $.ajax({
             url: url, 
-            data: JSON.stringify(request), 
+            data: JSON.stringify(request_params), 
             type: "POST",
             contentType: "application/json", 
-            success: function(rpcResData) {
-              rpcRes = rpcResData.data;
-              if (rpcRes.error != null && rpcRes.error != "") {
-                $(".rerun-modal-body").html("请求失败！<br/>" + rpcRes.error);
+            success: function(rpcRes) {
+              // rpcRes = rpcResData.data;
+              if (rpcRes.code != 0) {
+                $(".rerun-modal-body").html("请求失败！<br/>" + rpcRes.message);
               } else {
                 document.location.reload();
               }
@@ -432,20 +415,16 @@
             "flowInstId": <?php echo $flow_inst->id?>
           }
 
-          var request = {};
-          request.id = 3;
-          request.method = "FlowService.SetFlowInstanceSuccess";
-          request.params = [request_params];
-
+          var url = "/oneflow/SetFlowInstanceSuccess";
           $.ajax({
             url: url, 
-            data: JSON.stringify(request), 
+            data: JSON.stringify(request_params), 
             type: "POST",
             contentType: "application/json", 
-            success: function(rpcResData) {
-              rpcRes = rpcResData.data;
-              if (rpcRes.error != null && rpcRes.error != "") {
-                $(".rerun-modal-body").html("请求失败！<br/>" + rpcRes.error);
+            success: function(rpcRes) {
+              // rpcRes = rpcResData.data;
+              if (rpcRes.code != 0) {
+                $(".rerun-modal-body").html("请求失败！<br/>" + rpcRes.message);
               } else {
                 document.location.reload();
               }
@@ -456,15 +435,12 @@
           }); 
         }
 
-
         function show_log(date, ip, uuid) {
-
           bootbox.dialog({
             title: "运行日志",
             message: '<div class="log-modal-body">' +
             '<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>' +
             '</div>'})
-
 
           var request_params = {
             "host": ip,
@@ -472,20 +448,16 @@
             "date": date
           }
 
-          var request = {};
-          request.id = 3;
-          request.method = "FlowService.GetRemoteLog";
-          request.params = [request_params];
-
+          var url = "/oneflow/GetRemoteLog";
           $.ajax({
             url: url, 
-            data: JSON.stringify(request), 
+            data: JSON.stringify(request_params), 
             type: "POST",
             contentType: "application/json", 
             success: function(rpcResData) {
               rpcRes = rpcResData.data;
-              if (rpcRes.error != null && rpcRes.error != "") {
-                $(".log-modal-body").html("加载日志失败！<br/>" + rpcRes.error);
+              if (rpcRes.code != 0) {
+                $(".log-modal-body").html("加载日志失败！<br/>" + rpcRes.message);
               } else {
                 $(".log-modal-body").html('<div class="panel-group" id="accordion_log" role="tablist" aria-multiselectable="true">' +
                 '<div class="panel panel-default">' +
@@ -498,7 +470,7 @@
                 '  </div>' +
                 '  <div id="collapseCmdline" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingCmdline">' +
                 '    <div class="panel-body">' +
-                '      ' + htmlEncode(rpcRes.result.Cmdline) +
+                '      ' + htmlEncode(rpcRes.data.Cmdline) +
                 '    </div>' +
                 '  </div>' +
                 '</div>' +
@@ -512,7 +484,7 @@
                 '  </div>' +
                 '  <div id="collapseOutput" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOutput">' +
                 '    <div class="panel-body">' +
-                '      <pre>' + htmlEncode(rpcRes.result.Output) +'</pre>' +
+                '      <pre>' + htmlEncode(rpcRes.data.Output) +'</pre>' +
                 '    </div>' +
                 '  </div>' +
                 '</div>' +
@@ -526,7 +498,7 @@
                 '  </div>' +
                 '  <div id="collapseError" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingError">' +
                 '    <div class="panel-body">' +
-                '      <pre>' + htmlEncode(rpcRes.result.Error) +'</pre>' +
+                '      <pre>' + htmlEncode(rpcRes.data.Error) +'</pre>' +
                 '    </div>' +
                 '  </div>' +
                 '</div>' +

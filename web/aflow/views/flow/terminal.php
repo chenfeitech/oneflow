@@ -44,27 +44,23 @@
         theme: "mdn-like"
       });
 
-  var url = "/flow/api";
+
 $("#run").click(function () {
   var request_params = {
     "script": editor.getValue()
   }
 
-  var request = {};
-  request.id = 3;
-  request.method = "FlowService.RunScript";
-  request.params = [request_params];
-
+  var url = "/oneflow/RunScript";
   $.ajax({
     url: url, 
-    data: JSON.stringify(request), 
+    data: JSON.stringify(request_params), 
     type: "POST",
     contentType: "application/json", 
     success: function(rpcRes) {
-      if (rpcRes.error != null && rpcRes.error != "") {
-        $("#result").html("请求失败！<br/>" + rpcRes.error);
+      if (rpcRes.code != 0) {
+        $("#result").html("请求失败！<br/>" + rpcRes.message);
       } else {
-        $("#result").text(rpcRes.result.Output);
+        $("#result").text(rpcRes.Output);
         $("#result").each(function(idx, ele) {
             that=$(ele); 
             log = that.text().replace(/\[(([0-9]{1,3}\.){3}[0-9]{1,3})\] RUN:UUID\[(([0-9]|[a-f]|\-){36})\]/g, "<a class='process_log'  data-toggle='tooltip' data-placement='bottom' title='Show logs' href='javascript:show_log(\"" + that.attr("date") + "\",\"$1\",\"$3\")'>$&</a>");
@@ -80,88 +76,82 @@ $("#run").click(function () {
     }
   }); 
 });
+function show_log(date, ip, uuid) {
+
+  bootbox.dialog({
+    title: "运行日志",
+    message: '<div class="log-modal-body">' +
+    '<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>' +
+    '</div>'})
 
 
-        function show_log(date, ip, uuid) {
+  var request_params = {
+    "host": ip,
+    "uuid": uuid, 
+    "date": "<?php echo date('Y-m-d')?>"
+  }
 
-          bootbox.dialog({
-            title: "运行日志",
-            message: '<div class="log-modal-body">' +
-            '<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>' +
-            '</div>'})
-
-
-          var request_params = {
-            "host": ip,
-            "uuid": uuid, 
-            "date": "<?php echo date('Y-m-d')?>"
-          }
-
-          var request = {};
-          request.id = 3;
-          request.method = "FlowService.GetRemoteLog";
-          request.params = [request_params];
-
-          $.ajax({
-            url: url, 
-            data: JSON.stringify(request), 
-            type: "POST",
-            contentType: "application/json", 
-            success: function(rpcRes) {
-              if (rpcRes.error != null && rpcRes.error != "") {
-                $(".log-modal-body").html("加载日志失败！<br/>" + rpcRes.error);
-              } else {
-                $(".log-modal-body").html('<div class="panel-group" id="accordion_log" role="tablist" aria-multiselectable="true">' +
-                '<div class="panel panel-default">' +
-                '  <div class="panel-heading" role="tab" id="headingCmdline">' +
-                '    <h4 class="panel-title">' +
-                '      <a role="button" data-toggle="collapse" data-parent="#accordion_log" href="#collapseCmdline" aria-expanded="true" aria-controls="collapseCmdline">' +
-                '        Command Line' +
-                '      </a>' +
-                '    </h4>' +
-                '  </div>' +
-                '  <div id="collapseCmdline" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingCmdline">' +
-                '    <div class="panel-body">' +
-                '      ' + rpcRes.result.Cmdline +
-                '    </div>' +
-                '  </div>' +
-                '</div>' +
-                '<div class="panel panel-default">' +
-                '  <div class="panel-heading" role="tab" id="headingOutput">' +
-                '    <h4 class="panel-title">' +
-                '      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion_log" href="#collapseOutput" aria-expanded="true" aria-controls="collapseOutput">' +
-                '        Standard Output' +
-                '      </a>' +
-                '    </h4>' +
-                '  </div>' +
-                '  <div id="collapseOutput" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOutput">' +
-                '    <div class="panel-body">' +
-                '      <pre>' + rpcRes.result.Output +'</pre>' +
-                '    </div>' +
-                '  </div>' +
-                '</div>' +
-                '<div class="panel panel-default">' +
-                '  <div class="panel-heading" role="tab" id="headingError">' +
-                '    <h4 class="panel-title">' +
-                '      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion_log" href="#collapseError" aria-expanded="false" aria-controls="collapseError">' +
-                '        Error Output' +
-                '      </a>' +
-                '    </h4>' +
-                '  </div>' +
-                '  <div id="collapseError" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingError">' +
-                '    <div class="panel-body">' +
-                '      <pre>' + rpcRes.result.Error +'</pre>' +
-                '    </div>' +
-                '  </div>' +
-                '</div>' +
-                '</div>');
-              }
-            }, 
-            error: function(err, status, thrown) {
-              $(".log-modal-body").html("请求失败！<br/>" + err.responseText);
-            }
-          });
-        }
-    </script>
+  var url = "/oneflow/GetRemoteLog";
+  $.ajax({
+    url: url, 
+    data: JSON.stringify(request_params), 
+    type: "POST",
+    contentType: "application/json", 
+    success: function(rpcRes) {
+      if (rpcRes.coe != 0) {
+        $(".log-modal-body").html("加载日志失败！<br/>" + rpcRes.message);
+      } else {
+        $(".log-modal-body").html('<div class="panel-group" id="accordion_log" role="tablist" aria-multiselectable="true">' +
+        '<div class="panel panel-default">' +
+        '  <div class="panel-heading" role="tab" id="headingCmdline">' +
+        '    <h4 class="panel-title">' +
+        '      <a role="button" data-toggle="collapse" data-parent="#accordion_log" href="#collapseCmdline" aria-expanded="true" aria-controls="collapseCmdline">' +
+        '        Command Line' +
+        '      </a>' +
+        '    </h4>' +
+        '  </div>' +
+        '  <div id="collapseCmdline" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingCmdline">' +
+        '    <div class="panel-body">' +
+        '      ' + rpcRes.data.Cmdline +
+        '    </div>' +
+        '  </div>' +
+        '</div>' +
+        '<div class="panel panel-default">' +
+        '  <div class="panel-heading" role="tab" id="headingOutput">' +
+        '    <h4 class="panel-title">' +
+        '      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion_log" href="#collapseOutput" aria-expanded="true" aria-controls="collapseOutput">' +
+        '        Standard Output' +
+        '      </a>' +
+        '    </h4>' +
+        '  </div>' +
+        '  <div id="collapseOutput" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOutput">' +
+        '    <div class="panel-body">' +
+        '      <pre>' + rpcRes.data.Output +'</pre>' +
+        '    </div>' +
+        '  </div>' +
+        '</div>' +
+        '<div class="panel panel-default">' +
+        '  <div class="panel-heading" role="tab" id="headingError">' +
+        '    <h4 class="panel-title">' +
+        '      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion_log" href="#collapseError" aria-expanded="false" aria-controls="collapseError">' +
+        '        Error Output' +
+        '      </a>' +
+        '    </h4>' +
+        '  </div>' +
+        '  <div id="collapseError" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingError">' +
+        '    <div class="panel-body">' +
+        '      <pre>' + rpcRes.data.Error +'</pre>' +
+        '    </div>' +
+        '  </div>' +
+        '</div>' +
+        '</div>');
+      }
+    }, 
+    error: function(err, status, thrown) {
+      $(".log-modal-body").html("请求失败！<br/>" + err.responseText);
+    }
+  });
+}
+</script>
 </body>
 </html>

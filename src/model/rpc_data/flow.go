@@ -1,5 +1,24 @@
 package rpc_data
 
+
+type FlowDataArgs struct {
+	Id            string
+	Name          string
+	Description   string
+	Creator       string
+	StartupScript string
+	Tasks         []TaskData
+	DeleteTaskIds []string
+}
+
+type TaskData struct {
+	Id          string
+	Name        string
+	Script      string
+	MaxRetries  interface{} `json:"max_retries"`
+	Description string
+}
+
 type StateDataArgs struct {
 	PId     string
 	Key     string

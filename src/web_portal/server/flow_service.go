@@ -19,8 +19,6 @@ import (
 	"middleware/remote_utils"
 	"middleware/microservice"
 
-	// "github.com/gorilla/rpc"
-	// "github.com/gorilla/rpc/json"
 	log "github.com/cihub/seelog"
 	"github.com/go-sql-driver/mysql"
 )

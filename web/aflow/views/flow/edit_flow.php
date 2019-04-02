@@ -327,7 +327,7 @@ li.selected {
     }
     save_values();
 
-    var url = "/oneflow/API";
+    var url = "/oneflow/";
 
     var lis = $("ol.example li");
     var tasks = new Array(lis.length);
@@ -371,32 +371,22 @@ li.selected {
       "deleteTaskIds": delete_item
     }
 
-    var request = {};
-    request.id = 2;
     if (flow_id != "") {
-      // url += "UpdateFlow"
-      request.method = "FlowService.UpdateFlow";
+      url += "UpdateFlow"
     } else {
-      // url += "AddFlow"
-      request.method = "FlowService.AddFlow";
+      url += "AddFlow"
     }
-    request.params = [request_params];
-
-
-    console.log(JSON.stringify(request));
-
-
     var $btn = $("#save_btn").button('loading');
     $.ajax({
       url: url,
-      data: JSON.stringify(request),
+      data: JSON.stringify(request_params),
       type: "POST",
       contentType: "application/json",
       success: function(rpcRes) {
         $btn.button('reset');
-        if (rpcRes.error != null && rpcRes.error != "") {
+        if (rpcRes.code != 0) {
           $("#myMsgBoxTitle").text("错误");
-          $("#myMsgBoxBody").text("保存失败：" + rpcRes.error);
+          $("#myMsgBoxBody").text("保存失败：" + rpcRes.message);
           $('#myMsgBox').modal();
         } else {
           document.location.href = "/flow/show_flow/" + new_flow_id;
