@@ -47,7 +47,7 @@ func main() {
 		"`id`",                         // columnId,
 		"concat(pid, '_', process_id)", // columnJobName,
 		"`start_time`",                 // columnPattern,
-		`concat('StartFlow("', process_id,'", "', pid,'", "", time.Now().Add(' ,data_delay, '*-24*time.Hour), "idata", nil)')`, // columnScript,
+		`concat('StartFlow("', process_id,'", "', pid,'", "", time.Now().Add(' ,data_delay, '*-24*time.Hour), "data", nil)')`, // columnScript,
 		`last_run_time`,                      // columnLastRunTime,
 		`next_run_time`,                      // columnNextRunTime,
 		"last_result",                        // columnLastRunResult,
