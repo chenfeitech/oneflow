@@ -1,5 +1,5 @@
-export GOPATH=$(shell pwd)/../:$(shell pwd)/../go-package/
-export CC=gcc -no-pie
+# export GOPATH=$(shell pwd)/../
+# export CC=gcc -no-pie
 
 #@echo "gopath:"$(GOPATH)
 #GOBIN=/usr/local/GOBIN/bin/go
@@ -12,13 +12,15 @@ FAgent=task_agent/flow_agent
 
 all: server agent
 
-#server:export GOROOT=/usr/local/GOBIN/
-server: export GOPATH=$(shell pwd)/../:$(shell pwd)/../go-package/
+# server:export GOROOT=/usr/local/GOBIN/
+# server: export GOPATH="${GOPATH}":$(shell pwd)/../
+server: export GOPATH=$(shell pwd)/../
 server:
-	$(GOBIN) build -o $(FServer) flow_server.go
+	$(GOBIN) build -o $(FServer) main/flow_server.go
 	cp $(FServer) ../pkg/bin/
 
 #agent:export GOROOT=/usr/local/GOBIN/
+agent: export GOPATH=$(shell pwd)/../
 agent:
 	$(GOBIN) build -o app/client app/client.go
 	$(GOBIN) build -o app/luar_demo app/luar_demo.go

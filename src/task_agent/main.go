@@ -8,7 +8,7 @@ import (
 	"task_agent/subcmd"
 	"time"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 func main() {

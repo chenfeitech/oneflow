@@ -20,7 +20,7 @@ import (
 	"config"
 	"utils/helper"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 var (

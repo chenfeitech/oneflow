@@ -9,26 +9,31 @@
               <input type="text" class="input-date form-control" id="end_date" value="2019-03-31" name="end_date">
               <input type="hidden" class="form-control" name="env" value="data_flow">
               <select name="set_nu" id="set_nu" class="form-control">
-                <option value="all">所有集群</option>
-                <option value="0">set0</option>
-                <option value="1">set1</option>
-                <option value="2">set2</option>
-                <option value="3">set3</option>
+                 <Option v-for="item in set_nu" :value="item.value" :key="item.value" name="set_type">
+                      {{ item.label }}
+                    </Option>
               </select>
               <select name="process_type" id="process_type" class="form-control">
                 <option value="all">所有流程</option>
                 <option value="NEW_FLOW">新流程</option>
                 <option value="NEW_FLOW2">新流程</option>
                 </select>
-              <select name="process_state_type" id="process_state_type" class="form-control">
-                <option value="-1">未成功</option>
-                <option value="all">所有状态</option>
-                <option value="2">成功</option>
-                <option value="3">失败</option>
-                </select>
+                <Select name="process_state_type" id="process_state_type" class="form-control">
+                    <Option v-for="item in process_state_type" :value="item.value" :key="item.value" name="state_type">
+                      {{ item.label }}
+                    </Option>
+                </Select>
               <select class="chosen-select" style="width: 200px; display: none;" tabindex="-1" id="pid">
                   <option value=""></option>
-                  <option selected="selected" value="all">所有</option><option value="222">222(223)</option>              </select><div class="chosen-container chosen-container-single" style="width: 200px;" title="" id="pid_chosen"><a class="chosen-single" tabindex="-1" data-original-title="" title=""><span>所有</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" tabindex="2"></div><ul class="chosen-results"><li class="active-result result-selected" data-option-array-index="1" style="">所有</li><li class="active-result" data-option-array-index="2" style="">222(223)</li></ul></div></div>
+                  <option selected="selected" value="all">所有业务</option><option value="222">222(223)</option>              
+                  </select>
+
+                <select  class="form-control" mame="pids" id="pids">
+                  <option value="all">所有</option>
+                  <Option v-for="item in pids" :value="item.value" :key="item.value" name="state_type">
+                      {{ item.label }}
+                    </Option>
+                </select>
               <button type="button" class="btn btn-success" onclick="show_flow_list()">查询</button>
           </div>
         </form>
@@ -55,6 +60,37 @@ export const test = 'http://oneflow.com';
 export default {
   data () {
     return {
+       process_state_type: [
+          {
+              value: '-1', label: '未成功'
+          },
+          {
+              value: 'all', label: '所有状态'
+          },
+          {
+              value: '2', label: '成功'
+          },
+          {
+              value: '3', label: '失败'
+          },
+       ],
+       set_nu: [
+          {
+              value: 'all', label: '所有集群'
+          },
+          {
+              value: '0', label: 'set0'
+          },
+          {
+              value: '1', label: 'set1'
+          },
+       ],
+       pids: [
+          {
+              value: '222', label: '222'
+          },
+
+       ],
       info: null
     }
   },

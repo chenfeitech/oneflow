@@ -1,6 +1,6 @@
 package subcmd
 
-import "github.com/codegangsta/cli"
+import "github.com/urfave/cli"
 
 var (
 	cmds = make([]cli.Command, 0)

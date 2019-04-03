@@ -10,7 +10,8 @@ import (
 	"strings"
 
 	json "web_portal/jsonrpc2/json2"
-	nsq "github.com/EncoreJiang/go-nsq"
+	// nsq "github.com/EncoreJiang/go-nsq"
+	nsq "github.com/nsqio/go-nsq"
 	"github.com/cihub/seelog"
 )
 

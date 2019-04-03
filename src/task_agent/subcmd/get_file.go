@@ -3,7 +3,7 @@ package subcmd
 import (
 	"errors"
 	"fmt"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"utils/helper"
 	"io"
 	"math/rand"

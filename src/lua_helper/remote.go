@@ -23,7 +23,8 @@ import (
 	"model"
 	"utils/helper"
 
-	"code.google.com/p/uuid"
+	// "code.google.com/p/uuid"
+	"github.com/google/uuid"
 	"github.com/yuin/gopher-lua"
 	log "github.com/cihub/seelog"
 	"golang.org/x/crypto/ssh"
@@ -140,7 +141,7 @@ func (l *iState) remote_exec(host string, program string, args ...interface{}) (
 	if len(host) == 0 {
 		panic(errors.New("Must give remote host to exec program!"))
 	}
-	guid = uuid.New()
+	guid = uuid.New().String()
 
 	log.Info(append([]interface{}{"remote_exec " + guid + " " + host + " " + program}, args...)...)
 

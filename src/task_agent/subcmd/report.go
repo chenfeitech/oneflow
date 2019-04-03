@@ -11,7 +11,7 @@ import (
 	"middleware/nsqhelper"
 	"model/rpc_data"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 var lastReport = time.Now()

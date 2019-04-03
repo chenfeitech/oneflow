@@ -9,7 +9,8 @@ import (
 	"sync"
 	"time"
 
-	nsq "github.com/EncoreJiang/go-nsq"
+	// nsq "github.com/EncoreJiang/go-nsq"
+	nsq "github.com/nsqio/go-nsq"
 	"github.com/cihub/seelog"
 	// consul "github.com/hashicorp/consul/api"
 )
