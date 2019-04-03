@@ -18,7 +18,7 @@ ln -s /home/helight/oneflow/web /home/helight/www/      // 这是web页面
 ## workdir
     config/config.go
 ``` go
-    ServerRoot = flag.String("server_root`", "/data/oneflow/", "Root of flow server.")
+ServerRoot = flag.String("server_root`", "/data/oneflow/", "Root of flow server.")
 ```
 ## database:
 数据库配置，非常简单。
@@ -45,6 +45,14 @@ var (
 ServerHost = flag.String("server_host", helper.GetIPAddr(), "Host of flow server.")
 ServerPort = flag.String("server_port", "3001", "Port of flow server.")
 ```
+
+# 编译 golang服务
+目前项目是用dep来管理第三方库，所以要先下载第三方库，在进入src目录之后，使用`dep ensure`，执行之后再执行`make`即可。
+```
+cd src
+dep ensure
+make
+```
 ## nsq config & init
 使用nsq作为消息队列，所以需要配置nsq。
 ### config
@@ -61,7 +69,7 @@ ServerPort = flag.String("server_port", "3001", "Port of flow server.")
 #### web service for nsq
 启动nsq的web管理端
 ``` sh
-    ./nsqadmin --lookupd-http-address=127.0.0.1:4161 
+./nsqadmin --lookupd-http-address=127.0.0.1:4161 
 ```
 http://localhost:4171/ 通过这个地址可以直接访问nsq的管理端
 #### create on topic
