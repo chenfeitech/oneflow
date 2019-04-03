@@ -10,8 +10,8 @@ oneflow，目标是web化的分布式流程系统，可以远程执行任务
     for example the work dir is /data/oneflow/, so you should copy pkg dir which is in this project
 to the work dir, or just make a link from pkg dir to the work dir. just like this:
 ``` sh
-    ln -s /home/helight/oneflow/pkg /data/oneflow           // 是工作目录，要和上面的配置一致。
-    ln -s /home/helight/oneflow/web /home/helight/www/      // 这是web页面
+ln -s /home/helight/oneflow/pkg /data/oneflow           // 是工作目录，要和上面的配置一致。
+ln -s /home/helight/oneflow/web /home/helight/www/      // 这是web页面
 ```
 
 # Config
@@ -24,26 +24,26 @@ to the work dir, or just make a link from pkg dir to the work dir. just like thi
 数据库配置，非常简单。
     config/database.go
 ``` go
-    var (
-        db_host = flag.String("db_host", func() string {
-                              if runtime.GOOS == "darwin" {
-                              return "127.0.0.1"
-                              } else {
-                              return "127.0.0.1"
-                              }
-                              }(), "mysql server host")
-        db_port     = flag.Int("db_port", 3306, "mysql server port")
-        db_username = flag.String("db_username", "admin", "mysql server username")
-        db_password = flag.String("db_password", "mysql", "mysql server password")
-        db_name     = flag.String("db_name", "aflow", "mysql server name")
-    )
+var (
+    db_host = flag.String("db_host", func() string {
+                            if runtime.GOOS == "darwin" {
+                            return "127.0.0.1"
+                            } else {
+                            return "127.0.0.1"
+                            }
+                            }(), "mysql server host")
+    db_port     = flag.Int("db_port", 3306, "mysql server port")
+    db_username = flag.String("db_username", "admin", "mysql server username")
+    db_password = flag.String("db_password", "mysql", "mysql server password")
+    db_name     = flag.String("db_name", "aflow", "mysql server name")
+)
 ```
 ## server work port
 服务端口配置
     config/server.go
 ``` go
-    ServerHost = flag.String("server_host", helper.GetIPAddr(), "Host of flow server.")
-    ServerPort = flag.String("server_port", "3001", "Port of flow server.")
+ServerHost = flag.String("server_host", helper.GetIPAddr(), "Host of flow server.")
+ServerPort = flag.String("server_port", "3001", "Port of flow server.")
 ```
 ## nsq config & init
 使用nsq作为消息队列，所以需要配置nsq。
@@ -55,19 +55,19 @@ to the work dir, or just make a link from pkg dir to the work dir. just like thi
 #### main server
 启动nsq主服务
 ``` sh
-    ./nsqlookupd
-    ./nsqd --lookupd-tcp-address=127.0.0.1:4160
+./nsqlookupd
+./nsqd --lookupd-tcp-address=127.0.0.1:4160
 ```
 #### web service for nsq
 启动nsq的web管理端
 ``` sh
-    ./nsqadmin --lookupd-http-address=127.0.0.1:4161
-    http://localhost:4171/
+    ./nsqadmin --lookupd-http-address=127.0.0.1:4161 
 ```
+http://localhost:4171/ 通过这个地址可以直接访问nsq的管理端
 #### create on topic
 创建一个topic
 ``` sh
-    curl -d "hello 1" "http://127.0.0.1:4151/pub?topic=status.task.flow.data"
+curl -d "hello 1" "http://127.0.0.1:4151/pub?topic=status.task.flow.data"
 ```
 # db init
 数据库名称是：aflow
@@ -84,11 +84,11 @@ mysql -uroot -Daflow < /web/oneflow.sql
 ## init data
 初始化数据
 ``` sql
-    insert into tbProducts (`PId`,`State`,`Name`,`DBHost`,`DBName`, `StarLevel`) 
-        values ("222", 1, "223","127.0.0.1","223db", 1);
-    insert into tbServer(`host`,`port`,`username`,`password`) values ("127.0.0.1", 22, "helight", "helight");
-    insert into tbServer(`host`,`port`,`username`,`password`) values ("10.0.2.15", 22, "helight", "helight");
-    insert into tbServer(`host`,`port`,`username`,`password`) values ("172.22.112.56", 22, "helight", "helight");
+insert into tbProducts (`PId`,`State`,`Name`,`DBHost`,`DBName`, `StarLevel`) 
+    values ("222", 1, "223","127.0.0.1","223db", 1);
+insert into tbServer(`host`,`port`,`username`,`password`) values ("127.0.0.1", 22, "helight", "helight");
+insert into tbServer(`host`,`port`,`username`,`password`) values ("10.0.2.15", 22, "helight", "helight");
+insert into tbServer(`host`,`port`,`username`,`password`) values ("172.22.112.56", 22, "helight", "helight");
 ```
     ERROR:ssh: handshake failed: ssh: unable to authenticate, attempted methods [none password], no supported methods remain
 
@@ -97,8 +97,8 @@ mysql -uroot -Daflow < /web/oneflow.sql
     put those lua script to the task and run it, first you should have the shell script in this lua script.    
 
 ``` lua 
-    print("123")
-    puuid, output=gassert(remote_exec("127.0.0.1", "/data/oneflow/bin/script/test.sh", "222"))
-    print("Process UUID:"..puuid)
-    print("Remote exec output:"..output)
+print("123")
+puuid, output=gassert(remote_exec("127.0.0.1", "/data/oneflow/bin/script/test.sh", "222"))
+print("Process UUID:"..puuid)
+print("Remote exec output:"..output)
 ```
