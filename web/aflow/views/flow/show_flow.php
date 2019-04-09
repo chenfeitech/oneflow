@@ -163,7 +163,7 @@ ol.vertical li:hover
           $("#myMsgBoxBody").text("启动失败：" + rpcRes.message);
           $('#myMsgBox').modal();
         } else {
-          document.location.href = "/flow/flow_inst/" + rpcRes.flow_inst_id;
+          document.location.href = "/flow/flow_inst/" + rpcRes.data.flow_inst_id;
 
           // $btn.button('reset');
           // $("#myMsgBoxTitle").text("成功");
