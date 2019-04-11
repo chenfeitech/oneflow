@@ -316,51 +316,7 @@ class Flow extends BaseController
         $this->data['products'] = $products;
         $this->load->view('flow/show_flow', $this->data);
     }
-/*
-    public function api() {
-        if ($this->input->server('REQUEST_METHOD')!="POST") {
-	        var_dump($this->input->server('REQUEST_METHOD'));
-            return;
-        }
-        if (!$this->check_auth('group_user')) {
-            $this->load->view('comm/noright',$this->data);
-            return;
-        }
 
-        $url = 'http://localhost/data_flow/api';
-        $data = file_get_contents('php://input');
-
-        $headers = array();
-        foreach (getallheaders() as $name => $value) {
-            array_push($headers, "$name: $value");
-        }
-
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POSTFIELDS,$data);
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $response = curl_exec($ch);
-        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $headers = substr($response, 0, $header_size);
-        $body = substr($response, $header_size);
-
-        if(curl_errno($ch)) {
-            show_error(curl_error($ch));
-        } else {
-            foreach (explode("\r\n", $headers) as $header) {
-                $header = trim($header);
-                if ($header) header($header);
-            }
-            echo $body;
-        }
-        curl_close($ch);
-        return;
-    }
-*/
     public function get_task_state_text($id)
     {
         $text = "";
@@ -383,30 +339,5 @@ class Flow extends BaseController
                 break;
         }
         return $text;
-    }
-}
-
-if (!function_exists('getallheaders'))
-{
-    function getallheaders()
-    {
-        $headers = array();
-       foreach ($_SERVER as $name => $value)
-       {
-       $iname = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
-	   // var_dump($iname);
-           if (substr($name, 0, 5) == 'HTTP_')
-           {
-               $headers[$iname] = $value;
-           }
-       }
-       return $headers;
-    }
-}
-
-if (!function_exists('json_exception'))
-{
-    function json_exception($code, $message) {
-        throw new Exception($message, $code);
     }
 }
